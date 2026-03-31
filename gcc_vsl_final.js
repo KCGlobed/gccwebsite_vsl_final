@@ -296,6 +296,7 @@ function showError(el, msg) {
 }
 
 function startPayment(name, email, mobile, city, state) {
+  console.log("Starting payment initialization...", { name, email, mobile, city, state });
   fetch(BASE_URL + "/api/start-payment", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -311,6 +312,7 @@ function startPayment(name, email, mobile, city, state) {
   })
     .then(function (res) { return res.json(); })
     .then(function (data) {
+      console.log("start-payment response:", data);
       if (!data.success) {
         showStep(1);
         showError(
@@ -321,6 +323,7 @@ function startPayment(name, email, mobile, city, state) {
       }
 
       if (data.gateway === "cashfree") {
+        console.log("Launching Cashfree modal...");
         launchCashfree(data);
       } else {
         showStep(1);
@@ -331,7 +334,7 @@ function startPayment(name, email, mobile, city, state) {
       }
     })
     .catch(function (err) {
-      console.error("start-payment error:", err);
+      console.error("Critical error in start-payment:", err);
       showStep(1);
       showError(
         document.getElementById("gccFormError"),
@@ -342,37 +345,37 @@ function startPayment(name, email, mobile, city, state) {
 
 
 function launchCashfree(data) {
-  var cashfree = new Cashfree({ mode: "sandbox" });
+  console.log("Initializing Cashfree checkout (v3)...");
+  const cashfree = Cashfree({ mode: "sandbox" });
 
   cashfree.checkout({
     paymentSessionId: data.payment_session_id,
     redirectTarget: "_modal",
-    onSuccess: function (paymentData) {
-      completePayment(data.cf_order_id);
-    },
-    onFailure: function (paymentData) {
-      var errorMsg =
-        (paymentData && paymentData.error && paymentData.error.message) ||
-        "Payment failed. Please try again.";
-      var errorCode =
-        (paymentData && paymentData.error && paymentData.error.code) || "";
-
-      reportFailure(data.cf_order_id, null, errorMsg, errorCode);
-
+  }).then((result) => {
+    console.log("Cashfree checkout result object:", result);
+    if (result.error) {
+      console.warn("Cashfree checkout returned an error:", result.error);
+      reportFailure(data.cf_order_id, null, result.error.message, result.error.code);
       showStep(4);
-      document.getElementById("gccFailMsg").textContent = errorMsg;
-    },
-    onClose: function () {
-      console.log("Modal closed → verifying payment");
-
-      // 🔥 Always verify on close
+      document.getElementById("gccFailMsg").textContent = result.error.message;
+    } else if (result.paymentDetails) {
+      console.log("Cashfree checkout success (via result object):", result.paymentDetails);
+      completePayment(data.cf_order_id);
+    } else if (result.redirect) {
+      console.log("Cashfree checkout redirecting...");
+    } else {
+      console.log("Cashfree checkout finished without specific result. Verifying order status...");
       completePayment(data.cf_order_id);
     }
   });
+
+  // Note: Older callbacks like onSuccess/onFailure are ignored in V3 checkout() options
+  // but onClose might still be useful for manual closure detection if supported.
 }
 
 
 function completePayment(cf_order_id) {
+  console.log("Triggering /api/complete-payment for cf_order_id:", cf_order_id);
   showStep(2);
 
   fetch(BASE_URL + "/api/complete-payment", {
@@ -389,8 +392,10 @@ function completePayment(cf_order_id) {
 
       // ✅ ONLY success condition
       if (data && data.success === true) {
+        console.log("Payment successful according to backend.");
         showStep(3); // 🎉 success UI
       } else {
+        console.warn("Payment verification failed according to backend.", data.message || "Unknown error");
         showStep(4); // ❌ failure UI
 
         document.getElementById("gccFailMsg").textContent =
@@ -398,7 +403,7 @@ function completePayment(cf_order_id) {
       }
     })
     .catch(function (err) {
-      console.error("complete-payment error:", err);
+      console.error("complete-payment network error:", err);
 
       // ✅ network failure = failure UI
       showStep(4);
@@ -409,18 +414,21 @@ function completePayment(cf_order_id) {
 }
 
 function reportFailure(cf_order_id, payment_id, description, code) {
+  console.log("Reporting payment failure to backend...", { cf_order_id, payment_id, description, code });
   fetch(BASE_URL + "/api/report-payment-failure", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      order_id: cf_order_id,
-      payment_id: payment_id || "",
+      cf_order_id: cf_order_id,
+      cf_payment_id: payment_id || "",
       re_attempt_status: false,
       error_code: code || "",
       error_description: description || "",
     }),
+  }).then(res => res.json()).then(data => {
+    console.log("report-payment-failure response:", data);
   }).catch(function (e) {
-    console.warn("report-failure error:", e);
+    console.error("report-failure network error:", e);
   });
 }
 
