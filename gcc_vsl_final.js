@@ -342,7 +342,7 @@ function startPayment(name, email, mobile, city, state) {
 
 
 function launchCashfree(data) {
-  var cashfree = new Cashfree({mode:"sandbox"});
+  var cashfree = new Cashfree({ mode: "sandbox" });
 
   cashfree.checkout({
     paymentSessionId: data.payment_session_id,
@@ -363,11 +363,11 @@ function launchCashfree(data) {
       document.getElementById("gccFailMsg").textContent = errorMsg;
     },
     onClose: function () {
-      reportFailure(data.cf_order_id, null, "Payment window closed by user.", "USER_CLOSED");
-      showStep(4);
-      document.getElementById("gccFailMsg").textContent =
-        "Payment was cancelled. You can try again.";
-    },
+      console.log("Modal closed → verifying payment");
+
+      // 🔥 Always verify on close
+      completePayment(data.cf_order_id);
+    }
   });
 }
 
@@ -383,19 +383,28 @@ function completePayment(cf_order_id) {
       re_attempt_status: false,
     }),
   })
-    .then(function (res) { return res.json(); })
+    .then(res => res.json())
     .then(function (data) {
-      if (data.success) {
-        showStep(3);
+      console.log("complete-payment response:", data);
+
+      // ✅ ONLY success condition
+      if (data && data.success === true) {
+        showStep(3); // 🎉 success UI
       } else {
-        showStep(4);
+        showStep(4); // ❌ failure UI
+
         document.getElementById("gccFailMsg").textContent =
-          data.message || "Payment recorded but verification failed. Please contact support.";
+          data.message || "Payment verification failed.";
       }
     })
     .catch(function (err) {
       console.error("complete-payment error:", err);
+
+      // ✅ network failure = failure UI
       showStep(4);
+
+      document.getElementById("gccFailMsg").textContent =
+        "Network error during verification.";
     });
 }
 
