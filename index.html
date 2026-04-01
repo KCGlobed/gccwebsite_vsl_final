@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="./assets/gccschool.jpeg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GCC School — Watch How Placement Works</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap"
@@ -32,35 +33,35 @@
   </div>
 
   <!-- HERO -->
-<div class="hero">
+  <div class="hero">
 
-  <span class="pre-label">
-    India’s 1st Dedicated School for Commerce Graduates
-  </span>
+    <span class="pre-label">
+      India’s 1st Dedicated School for Commerce Graduates
+    </span>
 
-  <p class="hero-sub">
-    Aspiring Finance Professionals — B.Com / M.Com / MBA
-  </p>
+    <p class="hero-sub">
+      Aspiring Finance Professionals — B.Com / M.Com / MBA
+    </p>
 
-  <span class="guarantee-line">
-    🎯 Watch this short video to decide if the ₹2,950 NFET Starter Kit is right for you
-  </span>
+    <span class="guarantee-line">
+      🎯 Watch this short video to decide if the ₹2,950 NFET Starter Kit is right for you
+    </span>
 
-  <h1>
-    India's 1,800+ Global Capability Centers Are Hiring Right Now
-    <em>Get Hired First Before Training</em>
-  </h1>
+    <h1>
+      India's 1,800+ Global Capability Centers Are Hiring Right Now
+      <em>Get Hired First Before Training</em>
+    </h1>
 
-  <p class="highlight-line">
-    Offers Starting @ <strong>10 LPA</strong>
-  </p>
+    <p class="highlight-line">
+      Offers Starting @ <strong>10 LPA</strong>
+    </p>
 
-  <p class="hero-sub">
-    Watch this short video to understand how to land your dream role in 
-    EY, PwC, Deloitte, KPMG & other Global MNCs
-  </p>
+    <p class="hero-sub">
+      Watch this short video to understand how to land your dream role in
+      EY, PwC, Deloitte, KPMG & other Global MNCs
+    </p>
 
-</div>
+  </div>
 
   <!-- VIDEO SECTION -->
   <div class="video-section">
@@ -69,15 +70,21 @@
         <!-- REPLACE THIS WITH ACTUAL VIDEO EMBED (Vimeo/YouTube/Wistia) -->
         <!-- Example: <iframe src="https://player.vimeo.com/video/YOUR_ID?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe> -->
         <div class="video-placeholder" id="videoPlaceholder"
-          onclick="this.style.display='none'; document.getElementById('videoEmbed').style.display='block'; startVideoTimer();">
+          style="background: url('https://storage.googleapis.com/gcc_prod_static_files_backend/static/images/gcc_vsl_kc_video.jpeg') center/cover no-repeat;"
+          onclick="playVideo()">
+
           <div class="play-btn">▶</div>
-          <p class="video-title-text">How GCC School's Hire First, Train Later Model Works</p>
-          <p class="video-sub-text">Click to play · 8 minutes · Dr. Kamal Chhabra, Founder</p>
+          <!-- <p class="video-title-text">How GCC School's Hire First, Train Later Model Works</p>
+          <p class="video-sub-text">Click to play · 8 minutes · Dr. Kamal Chhabra, Founder</p> -->
         </div>
         <!-- Actual embed goes here — swap src with real video URL -->
-        <div id="videoEmbed"
-          style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; display:none; align-items:center; justify-content:center;">
-          <p style="color:white;font-size:16px;">[ Insert actual video embed here ]</p>
+        <div id="videoEmbed" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%;">
+
+          <iframe id="videoFrame" width="100%" height="100%"
+            src="http://storage.googleapis.com/gcc_prod_static_files_backend/static/videos/GCC%20VSL_BASIC%20CUTS.mp4"
+            frameborder="0" allow="autoplay; fullscreen" allowfullscreen>
+          </iframe>
+
         </div>
       </div>
       <div class="video-caption">
