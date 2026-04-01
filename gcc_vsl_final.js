@@ -456,3 +456,12 @@ function updateCityDropdown(selectedState) {
 }
 
 document.addEventListener("DOMContentLoaded", loadStateCityData);
+
+
+function playVideo() {
+  document.getElementById("videoPlaceholder").style.display = "none";
+  document.getElementById("videoEmbed").style.display = "block";
+
+  document.getElementById("videoFrame").src =
+    "http://storage.googleapis.com/gcc_prod_static_files_backend/static/videos/GCC%20VSL_BASIC%20CUTS.mp4";
+}
