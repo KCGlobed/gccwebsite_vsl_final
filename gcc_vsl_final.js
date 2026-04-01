@@ -1,7 +1,7 @@
 
 var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
 var FORM_TYPE = 2
-var FORM_ID = 1
+var FORM_ID = 170532
 
 function toggleFaq(el) {
   var item = el.parentElement;
@@ -20,7 +20,9 @@ function startLockCountdown() {
   var countdownEl = document.getElementById("btnCountdown");
   var msgEl = document.getElementById("btnActivateMsg");
   var btn = document.getElementById("mainCtaBtn");
-
+  if (btn) {
+    btn.disabled = false;
+  }
   lockInterval = setInterval(function () {
     lockRemaining--;
     if (lockRemaining > 0) {
@@ -32,7 +34,25 @@ function startLockCountdown() {
       btn.classList.add("cta-btn-active");
       if (msgEl) msgEl.style.display = "none";
       btn.onclick = function () {
-        openPaymentModal();
+
+        console.log("RAW search:", window.location.search); // 👈 IMPORTANT
+
+        const current = new URLSearchParams(window.location.search);
+
+        console.log("Current params size:", [...current.entries()]); // 👈 IMPORTANT
+
+        const params = new URLSearchParams({
+          name: current.get("full_name") || "",
+          email: current.get("email") || "",
+          mobile: current.get("phone") || "",
+          city: current.get("city") || "",
+          state: current.get("state") || "",
+          form_id: current.get("form_id")
+        });
+
+        console.log("Final Params →", params.toString());
+
+        window.location.href = "/payment.html?" + params.toString();
       };
     }
   }, 1000);
@@ -62,197 +82,6 @@ window.addEventListener("scroll", function () {
   }
 });
 
-function injectModal() {
-  if (document.getElementById("gccPaymentModal")) return;
-
-  var modal = document.createElement("div");
-  modal.id = "gccPaymentModal";
-  modal.innerHTML = `
-    <div class="gcc-modal-overlay" id="gccModalOverlay">
-      <div class="gcc-modal-box">
-        <button class="gcc-modal-close" id="gccModalClose" aria-label="Close">✕</button>
-
-        <!-- STEP 1: Details form -->
-        <div id="gccStep1">
-          <p class="gcc-modal-label">Almost there!</p>
-          <h2 class="gcc-modal-title">Reserve Your NFET Slot</h2>
-          <p class="gcc-modal-sub">Enter your details to proceed to secure payment.</p>
-
-          <div class="gcc-field-group">
-    <label>Full Name *</label>
-    <input type="text" id="gcc_name" placeholder="e.g. Priya Sharma" />
-  </div>
-
-  <!-- Email + Phone -->
-  <div class="gcc-row">
-    <div class="gcc-field-group">
-      <label>Email *</label>
-      <input type="email" id="gcc_email" placeholder="e.g. priya@gmail.com" />
-    </div>
-
-    <div class="gcc-field-group">
-      <label>Phone *</label>
-      <input type="tel" id="gcc_phone" placeholder="10-digit mobile number" />
-    </div>
-  </div>
-
-  <!-- State + City -->
-  <div class="gcc-row">
-    <div class="gcc-field-group">
-      <label>State *</label>
-      <input type="text" id="gcc_state" placeholder="e.g. Haryana" />
-    </div>
-
-    <div class="gcc-field-group">
-      <label>City *</label>
-      <input type="text" id="gcc_city" placeholder="e.g. Delhi" />
-    </div>
-  </div>
-
-          <div id="gccFormError" class="gcc-error" style="display:none;"></div>
-
-          <button class="gcc-pay-btn" id="gccPayBtn">
-            🔒 Pay ₹2,950 Securely »
-          </button>
-          <p class="gcc-modal-note">Cashfree secured payment · Instant WhatsApp confirmation</p>
-        </div>
-
-        <!-- STEP 2: Processing -->
-        <div id="gccStep2" style="display:none; text-align:center; padding:40px 0;">
-          <div class="gcc-spinner"></div>
-          <p style="margin-top:20px; font-size:15px; color:#ccc;">Setting up your payment session…</p>
-        </div>
-
-        <!-- STEP 3: Success -->
-        <div id="gccStep3" style="display:none; text-align:center; padding:40px 20px;">
-          <div style="font-size:56px;">🎉</div>
-          <h2 style="color:#f5a623; margin:16px 0 8px;">Payment Successful!</h2>
-          <p style="color:#ccc; font-size:15px;">Your NFET slot is reserved. Check WhatsApp for confirmation.</p>
-          <button class="gcc-pay-btn" style="margin-top:24px;" onclick="closePaymentModal()">Close</button>
-        </div>
-
-        <!-- STEP 4: Failed -->
-        <div id="gccStep4" style="display:none; text-align:center; padding:40px 20px;">
-          <div style="font-size:56px;">⚠️</div>
-          <h2 style="color:#e74c3c; margin:16px 0 8px;">Payment Failed</h2>
-          <p style="color:#ccc; font-size:15px;" id="gccFailMsg">Something went wrong. Please try again.</p>
-          <button class="gcc-pay-btn" style="margin-top:24px;" onclick="retryPayment()">Try Again</button>
-        </div>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-
-  // Inject modal styles
-  var style = document.createElement("style");
-  style.textContent = `
-    #gccPaymentModal { display:none; position:fixed; inset:0; z-index:9999; }
-    .gcc-modal-overlay {
-      position:fixed; inset:0;
-      background:rgba(0,0,0,0.82);
-      display:flex; align-items:center; justify-content:center;
-      padding:16px;
-      backdrop-filter:blur(4px);
-    }
-    .gcc-modal-box {
-      background:#1a1a2e;
-      border:1px solid rgba(245,166,35,0.25);
-      border-radius:16px;
-      padding:36px 32px;
-      width:100%; max-width:440px;
-      position:relative;
-      max-height:90vh;
-      overflow-y:auto;
-    }
-    .gcc-modal-close {
-      position:absolute; top:14px; right:18px;
-      background:none; border:none;
-      color:rgba(255,255,255,0.45);
-      font-size:20px; cursor:pointer; line-height:1;
-    }
-    .gcc-modal-close:hover { color:#fff; }
-    .gcc-modal-label {
-      font-size:11px; letter-spacing:2px; text-transform:uppercase;
-      color:#f5a623; font-weight:700; margin:0 0 8px;
-    }
-    .gcc-modal-title {
-      font-size:22px; font-weight:800; color:#fff; margin:0 0 8px;
-      font-family:'Bebas Neue', sans-serif; letter-spacing:1px;
-    }
-    .gcc-modal-sub { font-size:13px; color:rgba(255,255,255,0.5); margin:0 0 24px; }
-    .gcc-field-group { margin-bottom:16px; }
-    .gcc-field-group label {
-      display:block; font-size:12px; font-weight:600;
-      color:rgba(255,255,255,0.7); margin-bottom:6px;
-      font-family:'Manrope', sans-serif;
-    }
-    .gcc-req { color:#f5a623; }
-    .gcc-field-group input {
-      width:100%; padding:11px 14px;
-      background:rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius:8px; color:#fff; font-size:14px;
-      font-family:'Manrope', sans-serif;
-      box-sizing:border-box; transition:border 0.2s;
-      outline:none;
-    }
-    .gcc-field-group input:focus { border-color:#f5a623; }
-    .gcc-field-group input::placeholder { color:rgba(255,255,255,0.25); }
-    .gcc-error {
-      background:rgba(231,76,60,0.15); border:1px solid rgba(231,76,60,0.4);
-      border-radius:8px; padding:10px 14px;
-      color:#e74c3c; font-size:13px; margin-bottom:16px;
-    }
-    .gcc-pay-btn {
-      width:100%; padding:15px;
-      background:linear-gradient(135deg,#f5a623,#e8940f);
-      border:none; border-radius:10px;
-      color:#000; font-size:16px; font-weight:800;
-      cursor:pointer; letter-spacing:0.5px;
-      font-family:'Manrope', sans-serif;
-      transition:opacity 0.2s, transform 0.1s;
-    }
-    .gcc-pay-btn:hover { opacity:0.92; transform:translateY(-1px); }
-    .gcc-pay-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-    .gcc-modal-note {
-      text-align:center; font-size:11px;
-      color:rgba(255,255,255,0.3); margin-top:12px;
-    }
-    .gcc-spinner {
-      width:44px; height:44px; margin:0 auto;
-      border:3px solid rgba(245,166,35,0.2);
-      border-top-color:#f5a623;
-      border-radius:50%;
-      animation:gcc-spin 0.8s linear infinite;
-    }
-    @keyframes gcc-spin { to { transform:rotate(360deg); } }
-  `;
-  document.head.appendChild(style);
-
-  // Close on overlay click
-  document.getElementById("gccModalOverlay").addEventListener("click", function (e) {
-    if (e.target === this) closePaymentModal();
-  });
-  document.getElementById("gccModalClose").addEventListener("click", closePaymentModal);
-
-  // Pay button click
-  document.getElementById("gccPayBtn").addEventListener("click", handlePayClick);
-}
-
-
-function openPaymentModal() {
-  injectModal();
-  showStep(1);
-  document.getElementById("gccPaymentModal").style.display = "block";
-  document.body.style.overflow = "hidden";
-}
-
-function closePaymentModal() {
-  var modal = document.getElementById("gccPaymentModal");
-  if (modal) modal.style.display = "none";
-  document.body.style.overflow = "";
-}
-
 function retryPayment() {
   showStep(1);
 }
@@ -271,6 +100,9 @@ function handlePayClick() {
   var phone = document.getElementById("gcc_phone").value.trim();
   var city = document.getElementById("gcc_city").value.trim();
   var state = document.getElementById("gcc_state").value.trim();
+  const params = new URLSearchParams(window.location.search);
+  const form_id = params.get("form_id");
+  console.log("form_id", form_id);
   var errEl = document.getElementById("gccFormError");
 
   if (!name)
@@ -284,19 +116,16 @@ function handlePayClick() {
   if (!state)
     return showError(errEl, "Please enter your state.");
 
-  errEl.style.display = "none";
-  showStep(2);
-
-  startPayment(name, email, phone, city, state);
+  startPayment(name, email, phone, city, state, form_id);
 }
 
 function showError(el, msg) {
-  el.textContent = msg;
-  el.style.display = "block";
+  // el.textContent = msg;
+  // el.style.display = "block";
 }
 
-function startPayment(name, email, mobile, city, state) {
-  console.log("Starting payment initialization...", { name, email, mobile, city, state });
+function startPayment(name, email, mobile, city, state, form_id) {
+  console.log("Starting payment initialization...", { name, email, mobile, city, state, form_id });
   fetch(BASE_URL + "/api/start-payment", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -306,8 +135,9 @@ function startPayment(name, email, mobile, city, state) {
       mobile: mobile,
       city: city,
       state: state,
-      form_type: FORM_TYPE,
-      form_id: FORM_ID,
+      form_type: 2,
+      form_id: form_id,
+      source: 13
     }),
   })
     .then(function (res) { return res.json(); })
@@ -346,7 +176,7 @@ function startPayment(name, email, mobile, city, state) {
 
 function launchCashfree(data) {
   console.log("Initializing Cashfree checkout (v3)...");
-  const cashfree = Cashfree({ mode: "sandbox" });
+  const cashfree = new Cashfree({ mode: "sandbox" });
 
   cashfree.checkout({
     paymentSessionId: data.payment_session_id,
@@ -432,23 +262,56 @@ function reportFailure(cf_order_id, payment_id, description, code) {
   });
 }
 
+document.addEventListener("click", function (e) {
+  const btn = e.target.closest(".btn-gold, .btn-cta-large, .inline-cta a");
+  if (!btn) return;
 
-function wireCtaButtons() {
-  var selectors = [".btn-gold", ".btn-cta-large", ".inline-cta a"];
+  e.preventDefault();
+  e.stopPropagation();
+  console.log("RAW search:", window.location.search); // 👈 IMPORTANT
 
-  selectors.forEach(function (sel) {
-    document.querySelectorAll(sel).forEach(function (el) {
-      el.addEventListener("click", function (e) {
-        e.preventDefault();
-        openPaymentModal();
-      });
-    });
+  const current = new URLSearchParams(window.location.search);
+
+  console.log("Current params size:", [...current.entries()]); // 👈 IMPORTANT
+
+  const params = new URLSearchParams({
+    name: current.get("full_name") || "",
+    email: current.get("email") || "",
+    mobile: current.get("phone") || "",
+    city: current.get("city") || "",
+    state: current.get("state") || "",
+    form_id: current.get("form_id")
   });
-}
 
+  console.log("Final Params →", params.toString());
+
+  window.location.href = "/payment.html?" + params.toString();
+});
 
 window.addEventListener("DOMContentLoaded", function () {
   startLockCountdown();
-  wireCtaButtons();
-  injectModal();
+  // wireCtaButtons();
+  // injectModal();
 });
+
+
+function getParams() {
+  const p = new URLSearchParams(window.location.search);
+
+  return {
+    name: p.get("name"),
+    email: p.get("email"),
+    mobile: p.get("mobile"),
+    form_id: p.get("form_id"),
+  };
+}
+
+function prefill() {
+  const data = getParams();
+  console.log("data", data);
+  document.getElementById("gcc_name").value = data.name || "";
+  document.getElementById("gcc_email").value = data.email || "";
+  document.getElementById("gcc_phone").value = data.mobile || "";
+}
+
+window.onload = prefill;

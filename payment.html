@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GCC School — Confirm Your Seat</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -344,7 +345,7 @@
 <!-- SCROLLABLE BODY -->
 <div class="body-area">
   <div class="page-wrap">
-
+<div id="gccFormError" style="display:none; color:red; margin-bottom:10px;"></div>
     <!-- LEFT — scrolls -->
     <div class="left-col">
       <h1 class="headline">You Qualified.<br>Now Lock Your Seat.</h1>
@@ -428,25 +429,25 @@
           <div class="field-label">Amount <span class="req">*</span></div>
           <div class="field-row-amount">
             <span class="amount-label">Admission Confirmation Fee</span>
-            <span class="amount-value">₹X,XXX</span>
+            <span class="amount-value">₹2950</span>
           </div>
           <div style="font-size:11px; color: var(--green); margin-top:4px; padding-left:2px;">✓ Adjustable against total program fee</div>
         </div>
 
         <div class="field-group">
           <div class="field-label">Name <span class="req">*</span></div>
-          <input type="text" placeholder="Your full name">
+          <input type="text" id="gcc_name" placeholder="Your full name">
         </div>
         <div class="field-row-pair">
           <div class="field-group">
             <div class="field-label">Email <span class="req">*</span></div>
-            <input type="email" placeholder="your@email.com">
+            <input type="email" id="gcc_email" placeholder="your@email.com">
           </div>
           <div class="field-group">
             <div class="field-label">Phone <span class="req">*</span></div>
             <div class="phone-wrap">
               <div class="phone-prefix">+91</div>
-              <input type="text" placeholder="10-digit number">
+              <input id="gcc_phone" type="text" placeholder="10-digit number">
             </div>
           </div>
         </div>
@@ -454,7 +455,7 @@
         <div class="field-row-pair">
           <div class="field-group">
             <div class="field-label">State <span class="req">*</span></div>
-            <select>
+            <select id="gcc_state">
               <option value="">Select state</option>
               <option>Delhi</option>
               <option>Haryana</option>
@@ -467,7 +468,7 @@
           </div>
           <div class="field-group">
             <div class="field-label">City <span class="req">*</span></div>
-            <input type="text" placeholder="Your city">
+            <input id="gcc_city" type="text" placeholder="Your city">
           </div>
         </div>
 
@@ -476,7 +477,7 @@
             <div class="fee-line-label">Admission Confirmation Fee</div>
             <div class="fee-line-note">GST included · No hidden charges</div>
           </div>
-          <div class="fee-line-amount">₹X,XXX</div>
+          <div class="fee-line-amount">₹2950</div>
         </div>
 
         <div class="total-row">
@@ -484,19 +485,19 @@
             Total Due Today
             <small>Seats are limited for July 2026</small>
           </div>
-          <div class="total-amount">₹X,XXX</div>
+          <div class="total-amount">₹2950</div>
         </div>
 
         <div class="seats-warning">
-          ⚠️ Your seat is not confirmed until payment is received. Only [X] seats remain for the 2026 cohort.
+          ⚠️ Your seat is not confirmed until payment is received. Only few seats remain for the 2026 cohort.
         </div>
 
-        <button class="pay-btn">Pay Now &amp; Confirm Your Seat →</button>
+        <button class="pay-btn" onclick="handlePayClick()">Pay Now &amp; Confirm Your Seat →</button>
       </div>
     </div>
 
   </div>
 </div>
-
+ <script src="./gcc_vsl_final.js"></script>
 </body>
 </html>
