@@ -462,6 +462,12 @@ function playVideo() {
   document.getElementById("videoPlaceholder").style.display = "none";
   document.getElementById("videoEmbed").style.display = "block";
 
-  document.getElementById("videoFrame").src =
-    "http://storage.googleapis.com/gcc_prod_static_files_backend/static/videos/GCC%20VSL_BASIC%20CUTS.mp4";
+  const video = document.getElementById("videoPlayer");
+
+  // ✅ autoplay after user click
+  video.play().catch(() => {
+    console.log("Autoplay blocked (rare)");
+  });
+
+  startVideoTimer(); // your existing function
 }
