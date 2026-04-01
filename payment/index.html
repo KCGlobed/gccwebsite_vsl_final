@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCC School — Confirm Your Seat</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple-dark: #4C1D95;
+    --purple-btn: #6D28D9;
+    --accent: #7C3AED;
+    --text-dark: #1E1B4B;
+    --text-mid: #374151;
+    --text-soft: #6B7280;
+    --border: #E5E7EB;
+    --bg: #F9FAFB;
+    --white: #FFFFFF;
+    --green: #059669;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── FIXED TOP ── */
+  .top-bar {
+    flex-shrink: 0;
+    z-index: 100;
+  }
+
+  .trust-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 32px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    font-size: 12px;
+    color: var(--text-mid);
+    font-weight: 500;
+    flex-wrap: wrap;
+  }
+  .trust-bar span { display: flex; align-items: center; gap: 5px; }
+
+  .site-header {
+    background: var(--white);
+    padding: 13px 40px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text-dark);
+    letter-spacing: -0.2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  /* ── SCROLLABLE BODY AREA ── */
+  .body-area {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+  }
+
+  /* ── TWO-COLUMN LAYOUT ── */
+  .page-wrap {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 56px;
+    height: 100%;
+  }
+
+  /* LEFT — scrollable */
+  .left-col {
+    overflow-y: auto;
+    padding: 44px 0 80px;
+    height: 100%;
+  }
+  /* Hide scrollbar visually but keep functionality */
+  .left-col::-webkit-scrollbar { width: 4px; }
+  .left-col::-webkit-scrollbar-track { background: transparent; }
+  .left-col::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
+  .left-col::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+  /* RIGHT — fixed height, no scroll */
+  .right-col {
+    height: 100%;
+    overflow: hidden;
+    padding: 24px 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── LEFT CONTENT ── */
+  .headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    line-height: 1.18;
+    color: var(--text-dark);
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .purple-bar {
+    width: 44px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin: 14px 0 18px;
+  }
+  .subheadline {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-mid);
+    max-width: 520px;
+    margin-bottom: 36px;
+  }
+
+  .section-title {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 14px;
+  }
+
+  .included-list { list-style: none; margin-bottom: 32px; }
+  .included-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-mid);
+    padding: 9px 0;
+    border-bottom: 1px solid #F3F4F6;
+    line-height: 1.5;
+  }
+  .included-list li:last-child { border-bottom: none; }
+  .check {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #EDE9FE;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .check svg { width: 10px; height: 10px; stroke: var(--accent); stroke-width: 2.5; fill: none; }
+
+  .steps { margin-bottom: 36px; }
+  .step { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px; }
+  .step-num {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-body strong { display: block; font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px; }
+  .step-body p { font-size: 13px; color: var(--text-soft); line-height: 1.55; }
+
+  .trust-signals {
+    background: #F5F3FF;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 32px;
+  }
+  .trust-signals .signal {
+    font-size: 13px;
+    color: var(--text-mid);
+    padding: 5px 0;
+    display: flex; align-items: flex-start;
+    gap: 10px; line-height: 1.5;
+  }
+
+  .contact-block { margin-bottom: 24px; }
+  .contact-block .label { font-weight: 700; font-size: 13px; color: var(--text-dark); margin-bottom: 8px; }
+  .contact-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-mid); margin-bottom: 5px; }
+  .contact-row svg { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text-soft); fill: none; stroke-width: 1.8; }
+
+  .terms {
+    font-size: 12px; color: var(--text-soft); line-height: 1.6;
+    border-top: 1px solid var(--border); padding-top: 18px;
+    margin-bottom: 24px;
+  }
+  .terms strong { color: var(--text-mid); }
+
+  /* ── RIGHT PAYMENT CARD ── */
+  .payment-card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.05);
+    padding: 24px 22px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .payment-card::-webkit-scrollbar { width: 0; }
+
+  .card-title { font-weight: 700; font-size: 16px; color: var(--text-dark); margin-bottom: 3px; }
+
+  .order-summary-box {
+    background: #F5F3FF;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 9px;
+    font-size: 12px;
+    color: var(--text-mid);
+    /* line-height: 1.65; */
+  }
+  .order-summary-box .prog-name { font-weight: 700; font-size: 12.5px; color: var(--text-dark); margin-bottom: 3px; }
+
+  .field-group { margin-bottom: 14px; }
+  .field-label { font-size: 12px; font-weight: 500; color: var(--text-mid); margin-bottom: 5px; display: flex; align-items: center; gap: 2px; }
+  .req { color: #EF4444; }
+  .field-row-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .field-row-pair .field-group { margin-bottom: 14px; }
+  .field-row-amount {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px;
+    border: 1px solid var(--border); border-radius: 6px; background: #FAFAFA;
+  }
+  .amount-label { font-size: 12.5px; color: var(--text-mid); }
+  .amount-value { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+
+  input[type="text"], input[type="email"], select {
+    width: 100%;
+    padding: 8px 11px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+
+  .phone-wrap { display: flex; gap: 7px; }
+  .phone-prefix {
+    padding: 8px 10px;
+    border: 1px solid var(--border); border-radius: 6px;
+    font-size: 12.5px; font-family: inherit;
+    color: var(--text-mid); background: #F9FAFB; white-space: nowrap;
+  }
+
+  .fee-line {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-top: 1px solid var(--border); margin-top: 0px;
+  }
+  .fee-line-label { font-size: 12.5px; color: var(--text-mid); }
+  .fee-line-note { font-size: 10.5px; color: var(--text-soft); margin-top: 1px; }
+  .fee-line-amount { font-size: 13.5px; font-weight: 600; color: var(--text-dark); }
+
+  .total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0 14px;
+    border-top: 2px solid var(--text-dark); margin-top: 2px;
+  }
+  .total-label { font-size: 13.5px; font-weight: 700; color: var(--text-dark); }
+  .total-label small { display: block; font-size: 10.5px; font-weight: 400; color: var(--text-soft); margin-top: 2px; }
+  .total-amount { font-size: 20px; font-weight: 800; color: var(--text-dark); }
+
+  .seats-warning {
+    font-size: 11.5px; color: #B45309;
+    background: #FFFBEB; border: 1px solid #FDE68A;
+    border-radius: 6px; padding: 7px 11px; margin-bottom: 14px;
+  }
+
+  .pay-btn {
+    width: 100%; background: var(--purple-btn); color: white;
+    border: none; border-radius: 7px; padding: 13px;
+    font-size: 14.5px; font-weight: 700; font-family: inherit;
+    cursor: pointer; letter-spacing: 0.1px;
+    transition: background 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .pay-btn:hover { background: var(--purple-dark); }
+  .pay-btn:active { transform: scale(0.99); }
+
+  .payment-methods { display: flex; align-items: center; gap: 7px; margin-top: 10px; flex-wrap: wrap; }
+  .pm-tag {
+    font-size: 10.5px; font-weight: 600; color: var(--text-soft);
+    background: #F3F4F6; padding: 3px 7px; border-radius: 4px; letter-spacing: 0.3px;
+  }
+
+  /* BG pattern */
+  .bg-pattern {
+    position: fixed; top: 0; right: 0;
+    width: 340px; height: 100vh;
+    z-index: -1; opacity: 0.15; pointer-events: none;
+  }
+
+  @media (max-width: 860px) {
+    .page-wrap { grid-template-columns: 1fr; }
+    .body-area { overflow-y: auto; height: auto; }
+    .left-col, .right-col { height: auto; overflow: visible; }
+    .right-col { padding-bottom: 40px; }
+    .bg-pattern { display: none; }
+    .headline { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Fixed background pattern -->
+<svg class="bg-pattern" viewBox="0 0 340 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMid slice">
+  <defs>
+    <pattern id="hex" width="60" height="52" patternUnits="userSpaceOnUse">
+      <polygon points="30,1 59,16 59,46 30,61 1,46 1,16" fill="none" stroke="#9CA3AF" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="340" height="900" fill="url(#hex)"/>
+</svg>
+
+<!-- FIXED HEADER -->
+<div class="top-bar">
+  <div class="trust-bar">
+    <span>🔒 100% Secure Payment</span>
+    <span>🏛️ Govt. Recognised Program</span>
+    <span>✅ Seat Confirmed Instantly</span>
+  </div>
+  <!-- <div class="site-header">GCC School</div> -->
+</div>
+
+<!-- SCROLLABLE BODY -->
+<div class="body-area">
+  <div class="page-wrap">
+
+    <!-- LEFT — scrolls -->
+    <div class="left-col">
+      <h1 class="headline">You Qualified.<br>Now Lock Your Seat.</h1>
+      <div class="purple-bar"></div>
+      <p class="subheadline">Your conditional offer letter is ready. One payment stands between you and India's first GCC-focused career program — starting July 2026 at DLF Cyber City, Gurugram.</p>
+
+      <div class="section-title">What happens next</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <strong>Payment Confirmed</strong>
+            <p>You receive an official admission confirmation email within 15 minutes.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <strong>Onboarding Begins</strong>
+            <p>Your pre-cohort orientation kit, mentor assignment, and student portal access are unlocked.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <strong>Cohort Starts July 1, 2026</strong>
+            <p>Report to Building 9B, 16th Floor, DLF Cyber City — your GCC career begins here.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">What's included in your program</div>
+      <ul class="included-list">
+        <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>UK ACCA qualification (integrated)</li>
+        <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>AIMA PGCM — AICTE approved</li>
+        <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>British Council Master's in Corporate Communication</li>
+        <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>AI-enabled adaptive learning platform</li>
+        <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>6-month paid internship with hiring partners</li>
+        <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Access to 200+ global GCC hiring companies</li>
+        <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Campus at DLF Cyber City, Gurugram</li>
+      </ul>
+
+      <div class="trust-signals">
+        <div class="signal">🎓 <span><strong>Triple Qualification</strong> — UK ACCA · AIMA · British Council</span></div>
+        <div class="signal">🏢 <span>Located inside India's #1 GCC hub — DLF Cyber City</span></div>
+        <div class="signal">🤝 <span>200+ global hiring partners including Goldman Sachs, BCG, Barclays, Amex</span></div>
+        <div class="signal">📋 <span>Backed by KC GlobEd — 30 years of legacy, 20,000+ global students</span></div>
+      </div>
+
+      <div class="contact-block">
+        <div class="label">Questions before paying?</div>
+        <div class="contact-row">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11.5 19.79 19.79 0 01.01 2.82 2 2 0 012 .67h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.47a16 16 0 006.29 6.29l1.16-1.16a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          Call: +91 97735 76111 · WhatsApp: +91 96675 83222
+        </div>
+        <div class="contact-row">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          info@gccschool.com
+        </div>
+      </div>
+
+      <div class="terms">
+        <strong>Terms &amp; Conditions:</strong> By completing payment you agree to GCC School's enrollment terms. Admission confirmation fee is non-refundable after 48 hours. You agree to share information entered on this page with GCC School and our payment partner, adhering to applicable laws.
+      </div>
+    </div>
+
+    <!-- RIGHT — fixed, no scroll -->
+    <div class="right-col">
+      <div class="payment-card">
+        <div class="card-title">Payment Details</div>
+        <div class="purple-bar" style="margin-top:0; margin-bottom:16px;"></div>
+
+        <div class="order-summary-box">
+          <div class="prog-name">Your Enrollment Summary</div>
+          <div><strong>Program:</strong> AI-Enabled International Accounting Professionals (AEIAP)</div>
+          <div><strong>Cohort:</strong> July 2026 · 12 Months</div>
+          <div><strong>Location:</strong> DLF Cyber City, Sector 24, Gurugram</div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Amount <span class="req">*</span></div>
+          <div class="field-row-amount">
+            <span class="amount-label">Admission Confirmation Fee</span>
+            <span class="amount-value">₹X,XXX</span>
+          </div>
+          <div style="font-size:11px; color: var(--green); margin-top:4px; padding-left:2px;">✓ Adjustable against total program fee</div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Name <span class="req">*</span></div>
+          <input type="text" placeholder="Your full name">
+        </div>
+        <div class="field-row-pair">
+          <div class="field-group">
+            <div class="field-label">Email <span class="req">*</span></div>
+            <input type="email" placeholder="your@email.com">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Phone <span class="req">*</span></div>
+            <div class="phone-wrap">
+              <div class="phone-prefix">+91</div>
+              <input type="text" placeholder="10-digit number">
+            </div>
+          </div>
+        </div>
+ 
+        <div class="field-row-pair">
+          <div class="field-group">
+            <div class="field-label">State <span class="req">*</span></div>
+            <select>
+              <option value="">Select state</option>
+              <option>Delhi</option>
+              <option>Haryana</option>
+              <option>Maharashtra</option>
+              <option>Karnataka</option>
+              <option>Uttar Pradesh</option>
+              <option>Tamil Nadu</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">City <span class="req">*</span></div>
+            <input type="text" placeholder="Your city">
+          </div>
+        </div>
+
+        <div class="fee-line">
+          <div>
+            <div class="fee-line-label">Admission Confirmation Fee</div>
+            <div class="fee-line-note">GST included · No hidden charges</div>
+          </div>
+          <div class="fee-line-amount">₹X,XXX</div>
+        </div>
+
+        <div class="total-row">
+          <div class="total-label">
+            Total Due Today
+            <small>Seats are limited for July 2026</small>
+          </div>
+          <div class="total-amount">₹X,XXX</div>
+        </div>
+
+        <div class="seats-warning">
+          ⚠️ Your seat is not confirmed until payment is received. Only [X] seats remain for the 2026 cohort.
+        </div>
+
+        <button class="pay-btn">Pay Now &amp; Confirm Your Seat →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

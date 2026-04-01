@@ -1,0 +1,16 @@
+[debug] [2026-04-01T05:31:19.593Z] ----------------------------------------------------------------------
+[debug] [2026-04-01T05:31:19.594Z] Command:       /usr/local/bin/node /Users/suneelrajput/.npm-global/bin/firebase deploy --only hosting
+[debug] [2026-04-01T05:31:19.594Z] CLI Version:   15.12.0
+[debug] [2026-04-01T05:31:19.594Z] Platform:      darwin
+[debug] [2026-04-01T05:31:19.594Z] Node Version:  v24.14.0
+[debug] [2026-04-01T05:31:19.594Z] Time:          Wed Apr 01 2026 11:01:19 GMT+0530 (India Standard Time)
+[debug] [2026-04-01T05:31:19.594Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-01T05:31:19.857Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-01T05:31:19.857Z] > authorizing via signed-in user (kcglobed@gmail.com)
+[debug] [2026-04-01T05:31:19.857Z] [iam] checking project vsl-final-3e5d4 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-04-01T05:31:19.858Z] Checked if tokens are valid: false, expires at: 1774964427456
+[debug] [2026-04-01T05:31:19.858Z] Checked if tokens are valid: false, expires at: 1774964427456
+[debug] [2026-04-01T05:31:19.858Z] > refreshing access token with scopes: []
+[debug] [2026-04-01T05:31:19.859Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-04-01T05:31:19.859Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]

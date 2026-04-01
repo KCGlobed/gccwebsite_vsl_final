@@ -1,7 +1,7 @@
 
 var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
-var FORM_TYPE = "dossier";
-var FORM_ID = "1";
+var FORM_TYPE = 2
+var FORM_ID = 1
 
 function toggleFaq(el) {
   var item = el.parentElement;
