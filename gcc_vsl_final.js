@@ -173,7 +173,7 @@ function launchCashfree(data) {
     showStatusModal(false, "Payment gateway could not be loaded. Please refresh the page.", data.cf_order_id);
     return;
   }
-  const cashfree = Cashfree({ mode: "sandbox" });
+  const cashfree = Cashfree({ mode: "production" });
 
   cashfree.checkout({
     paymentSessionId: data.payment_session_id,
