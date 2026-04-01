@@ -95,6 +95,11 @@ function showStep(n) {
 
 
 function handlePayClick() {
+  if (!isFormValid()) {
+    // Keep the button disabled until all required fields are filled correctly.
+    return;
+  }
+
   var name = document.getElementById("gcc_name").value.trim();
   var email = document.getElementById("gcc_email").value.trim();
   var phone = document.getElementById("gcc_phone").value.trim();
@@ -102,27 +107,38 @@ function handlePayClick() {
   var state = document.getElementById("gcc_state").value.trim();
   const params = new URLSearchParams(window.location.search);
   const form_id = params.get("form_id");
-  console.log("form_id", form_id);
-  var errEl = document.getElementById("gccFormError");
-
-  if (!name)
-    return showError(errEl, "Please enter your full name.");
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    return showError(errEl, "Please enter a valid email address.");
-  if (!phone || !/^[6-9]\d{9}$/.test(phone))
-    return showError(errEl, "Please enter a valid 10-digit mobile number.");
-  if (!city)
-    return showError(errEl, "Please enter your city.");
-  if (!state)
-    return showError(errEl, "Please enter your state.");
 
   showLoadingModal("Initializing secure checkout...");
   startPayment(name, email, phone, city, state, form_id);
 }
 
 function showError(el, msg) {
-  // el.textContent = msg;
-  // el.style.display = "block";
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = "block";
+}
+
+function isFormValid() {
+  var name = document.getElementById("gcc_name")?.value.trim();
+  var email = document.getElementById("gcc_email")?.value.trim();
+  var phone = document.getElementById("gcc_phone")?.value.trim();
+  var state = document.getElementById("gcc_state")?.value.trim();
+  var city = document.getElementById("gcc_city")?.value.trim();
+
+  var emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || "");
+  var phoneValid = /^[6-9]\d{9}$/.test(phone || "");
+
+  return Boolean(name && emailValid && phoneValid && state && city);
+}
+
+function updatePayButtonState() {
+  var payBtn = document.querySelector(".pay-btn");
+  if (!payBtn) return;
+
+  var valid = isFormValid();
+  payBtn.disabled = !valid;
+  payBtn.style.opacity = valid ? "1" : "0.6";
+  payBtn.style.cursor = valid ? "pointer" : "not-allowed";
 }
 
 function startPayment(name, email, mobile, city, state, form_id) {
@@ -396,6 +412,7 @@ function prefill() {
   document.getElementById("gcc_name").value = data.name || "";
   document.getElementById("gcc_email").value = data.email || "";
   document.getElementById("gcc_phone").value = data.mobile || "";
+  updatePayButtonState();
 }
 
 window.onload = prefill;
@@ -453,21 +470,29 @@ function updateCityDropdown(selectedState) {
       citySelect.appendChild(option);
     });
   }
+  updatePayButtonState();
 }
 
-document.addEventListener("DOMContentLoaded", loadStateCityData);
+document.addEventListener("DOMContentLoaded", function() {
+  loadStateCityData();
+  updatePayButtonState();
 
-
-function playVideo() {
-  document.getElementById("videoPlaceholder").style.display = "none";
-  document.getElementById("videoEmbed").style.display = "block";
-
-  const video = document.getElementById("videoPlayer");
-
-  // ✅ autoplay after user click
-  video.play().catch(() => {
-    console.log("Autoplay blocked (rare)");
+  // Clear field errors and re-check button state when users interact with inputs
+  ["gcc_name", "gcc_email", "gcc_phone", "gcc_state", "gcc_city"].forEach(id => {
+    var element = document.getElementById(id);
+    if (element) {
+      element.addEventListener("input", function() {
+        updatePayButtonState();
+      });
+      element.addEventListener("change", function() {
+        updatePayButtonState();
+      });
+    }
   });
+});
 
-  startVideoTimer(); // your existing function
+// API may load state/city options after DOM and this ensures UI state updates if default values appear.
+function refreshPayButtonState() {
+  updatePayButtonState();
 }
+
