@@ -1,5 +1,5 @@
 
-var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
+var BASE_URL = "https://gccschool.com";
 var FORM_TYPE = 2
 var FORM_ID = 170532
 
