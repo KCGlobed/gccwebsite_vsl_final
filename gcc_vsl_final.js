@@ -1,5 +1,5 @@
 
-var BASE_URL = "https://gccschool.com";
+var BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
 var FORM_TYPE = 2
 var FORM_ID = 170532
 
@@ -152,7 +152,7 @@ function startPayment(name, email, mobile, city, state, form_id) {
       if (data.gateway === "cashfree") {
         console.log("Launching Cashfree modal...");
         // Ensure loader shows for at least 2 seconds
-        setTimeout(function() {
+        setTimeout(function () {
           closeStatusModal();
           launchCashfree(data);
         }, 2000);
@@ -170,8 +170,8 @@ function startPayment(name, email, mobile, city, state, form_id) {
 function launchCashfree(data) {
   console.log("Initializing Cashfree checkout (v3)...");
   if (typeof Cashfree === "undefined") {
-      showStatusModal(false, "Payment gateway could not be loaded. Please refresh the page.", data.cf_order_id);
-      return;
+    showStatusModal(false, "Payment gateway could not be loaded. Please refresh the page.", data.cf_order_id);
+    return;
   }
   const cashfree = Cashfree({ mode: "sandbox" });
 
@@ -205,7 +205,7 @@ function completePayment(cf_order_id) {
   showLoadingModal("Verifying your payment...");
 
   // Artificial delay to ensure loader is visible
-  setTimeout(function() {
+  setTimeout(function () {
     fetch(BASE_URL + "/api/complete-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -236,7 +236,7 @@ function completePayment(cf_order_id) {
 function showStatusModal(isSuccess, message, orderId) {
   var overlay = document.getElementById("statusModalOverlay");
   if (!overlay) return;
-  
+
   var iconWrap = document.getElementById("statusIconWrap");
   var title = document.getElementById("statusTitle");
   var titleHighlight = document.getElementById("statusTitleHighlight");
@@ -288,7 +288,7 @@ function showStatusModal(isSuccess, message, orderId) {
 function showLoadingModal(message) {
   var overlay = document.getElementById("statusModalOverlay");
   if (!overlay) return;
-  
+
   var iconWrap = document.getElementById("statusIconWrap");
   var title = document.getElementById("statusTitle");
   var titleHighlight = document.getElementById("statusTitleHighlight");
@@ -305,19 +305,19 @@ function showLoadingModal(message) {
 
   iconWrap.className = "status-icon-wrap loading";
   iconWrap.innerHTML = '<div class="status-icon-outer" style="animation: spin 3s linear infinite;"></div><div class="status-icon-middle" style="animation: spin 2s linear infinite reverse;"></div><div class="status-icon-inner"><svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.07-7.07l-2.83 2.83M7.76 16.24l-2.83 2.83M19.07 19.07l-2.83-2.83M4.93 4.93l2.83 2.83" style="animation: spin 1.5s linear infinite; transform-origin: 12px 12px;"/></svg></div>';
-  
+
   badge.className = "status-badge loading";
   badge.textContent = "✦ PROCESSING";
-  
+
   title.childNodes[0].nodeValue = "Please ";
   titleHighlight.textContent = "Wait";
   titleHighlight.className = "text-yellow";
-  
+
   desc.innerHTML = message || 'We are securely initializing your payment gateway.<br>Do not refresh or close this window.';
-  
+
   dot.className = "green-dot";
   leftText.textContent = "Secure Connection";
-  
+
   retryBtn.style.display = "none";
   pid.style.display = "none";
 }
@@ -414,7 +414,7 @@ function loadStateCityData() {
         while (stateSelect.options.length > 1) {
           stateSelect.remove(1);
         }
-        
+
         // Add all states
         const states = Object.keys(data).sort();
         states.forEach(state => {
@@ -423,14 +423,14 @@ function loadStateCityData() {
           option.textContent = state;
           stateSelect.appendChild(option);
         });
-        
-        stateSelect.addEventListener("change", function() {
+
+        stateSelect.addEventListener("change", function () {
           updateCityDropdown(this.value);
         });
-        
+
         // Just in case prefill has already set a value
         if (stateSelect.value) {
-            updateCityDropdown(stateSelect.value);
+          updateCityDropdown(stateSelect.value);
         }
       }
     })
@@ -440,10 +440,10 @@ function loadStateCityData() {
 function updateCityDropdown(selectedState) {
   const citySelect = document.getElementById("gcc_city");
   if (!citySelect) return;
-  
+
   // Reset options
   citySelect.innerHTML = '<option value="">Select city</option>';
-  
+
   if (selectedState && stateCityData && stateCityData[selectedState]) {
     const cities = stateCityData[selectedState].sort();
     cities.forEach(city => {
@@ -474,9 +474,9 @@ function playVideo() {
 
 async function handleBookFreeCall(e) {
   e.preventDefault();
-  
+
   showLoadingModal("Processing your request...");
-  
+
   const current = new URLSearchParams(window.location.search);
   const data = {
     full_name: current.get('full_name') || "",
@@ -486,7 +486,7 @@ async function handleBookFreeCall(e) {
     degree_stage: current.get('degree_stage') || "",
     book_call: 1
   };
-  
+
   try {
     const res = await fetch(`https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app/api/career/createvslform`, {
       method: "POST",
@@ -495,7 +495,7 @@ async function handleBookFreeCall(e) {
     });
     const result = await res.json();
     console.log("API Response:", result);
-    
+
     // show success modal
     showStatusModal(true, 'You will <span class="text-highlight">receive the call within 2 hours</span> from our expert.<br>Please keep your phone accessible.', null);
   } catch (err) {
