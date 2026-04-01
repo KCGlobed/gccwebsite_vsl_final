@@ -116,6 +116,7 @@ function handlePayClick() {
   if (!state)
     return showError(errEl, "Please enter your state.");
 
+  showLoadingModal("Initializing secure checkout...");
   startPayment(name, email, phone, city, state, form_id);
 }
 
@@ -144,39 +145,35 @@ function startPayment(name, email, mobile, city, state, form_id) {
     .then(function (data) {
       console.log("start-payment response:", data);
       if (!data.success) {
-        showStep(1);
-        showError(
-          document.getElementById("gccFormError"),
-          data.message || "Could not initiate payment. Please try again."
-        );
+        showStatusModal(false, data.message || "Could not initiate payment. Please try again.", null);
         return;
       }
 
       if (data.gateway === "cashfree") {
         console.log("Launching Cashfree modal...");
-        launchCashfree(data);
+        // Ensure loader shows for at least 2 seconds
+        setTimeout(function() {
+          closeStatusModal();
+          launchCashfree(data);
+        }, 2000);
       } else {
-        showStep(1);
-        showError(
-          document.getElementById("gccFormError"),
-          "Unexpected gateway response. Please contact support."
-        );
+        showStatusModal(false, "Unexpected gateway response. Please contact support.", null);
       }
     })
     .catch(function (err) {
       console.error("Critical error in start-payment:", err);
-      showStep(1);
-      showError(
-        document.getElementById("gccFormError"),
-        "Network error. Please check your connection and try again."
-      );
+      showStatusModal(false, "Network error. Please check your connection and try again.", null);
     });
 }
 
 
 function launchCashfree(data) {
   console.log("Initializing Cashfree checkout (v3)...");
-  const cashfree = new Cashfree({ mode: "sandbox" });
+  if (typeof Cashfree === "undefined") {
+      showStatusModal(false, "Payment gateway could not be loaded. Please refresh the page.", data.cf_order_id);
+      return;
+  }
+  const cashfree = Cashfree({ mode: "sandbox" });
 
   cashfree.checkout({
     paymentSessionId: data.payment_session_id,
@@ -186,8 +183,7 @@ function launchCashfree(data) {
     if (result.error) {
       console.warn("Cashfree checkout returned an error:", result.error);
       reportFailure(data.cf_order_id, null, result.error.message, result.error.code);
-      showStep(4);
-      document.getElementById("gccFailMsg").textContent = result.error.message;
+      showStatusModal(false, result.error.message, data.cf_order_id);
     } else if (result.paymentDetails) {
       console.log("Cashfree checkout success (via result object):", result.paymentDetails);
       completePayment(data.cf_order_id);
@@ -206,41 +202,129 @@ function launchCashfree(data) {
 
 function completePayment(cf_order_id) {
   console.log("Triggering /api/complete-payment for cf_order_id:", cf_order_id);
-  showStep(2);
+  showLoadingModal("Verifying your payment...");
 
-  fetch(BASE_URL + "/api/complete-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      cf_order_id: cf_order_id,
-      re_attempt_status: false,
-    }),
-  })
-    .then(res => res.json())
-    .then(function (data) {
-      console.log("complete-payment response:", data);
-
-      // ✅ ONLY success condition
-      if (data && data.success === true) {
-        console.log("Payment successful according to backend.");
-        showStep(3); // 🎉 success UI
-      } else {
-        console.warn("Payment verification failed according to backend.", data.message || "Unknown error");
-        showStep(4); // ❌ failure UI
-
-        document.getElementById("gccFailMsg").textContent =
-          data.message || "Payment verification failed.";
-      }
+  // Artificial delay to ensure loader is visible
+  setTimeout(function() {
+    fetch(BASE_URL + "/api/complete-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cf_order_id: cf_order_id,
+        re_attempt_status: false,
+      }),
     })
-    .catch(function (err) {
-      console.error("complete-payment network error:", err);
+      .then(res => res.json())
+      .then(function (data) {
+        console.log("complete-payment response:", data);
 
-      // ✅ network failure = failure UI
-      showStep(4);
+        if (data && data.success === true) {
+          console.log("Payment successful according to backend.");
+          showStatusModal(true, "", cf_order_id);
+        } else {
+          console.warn("Payment verification failed according to backend.", data.message || "Unknown error");
+          showStatusModal(false, data.message || "Payment verification failed.", cf_order_id);
+        }
+      })
+      .catch(function (err) {
+        console.error("complete-payment network error:", err);
+        showStatusModal(false, "Network error during verification.", cf_order_id);
+      });
+  }, 2000);
+}
 
-      document.getElementById("gccFailMsg").textContent =
-        "Network error during verification.";
-    });
+function showStatusModal(isSuccess, message, orderId) {
+  var overlay = document.getElementById("statusModalOverlay");
+  if (!overlay) return;
+  
+  var iconWrap = document.getElementById("statusIconWrap");
+  var title = document.getElementById("statusTitle");
+  var titleHighlight = document.getElementById("statusTitleHighlight");
+  var desc = document.getElementById("statusDesc");
+  var badge = document.getElementById("statusBadge");
+  var dot = document.getElementById("statusDot");
+  var leftText = document.getElementById("statusLeftText");
+  var pid = document.getElementById("statusPaymentId");
+  var retryBtn = document.getElementById("statusRetryBtn");
+  var closeBtn = document.querySelector(".status-close-btn");
+
+  overlay.classList.add("active");
+  if (closeBtn) closeBtn.style.display = "flex";
+
+  if (isSuccess) {
+    iconWrap.className = "status-icon-wrap";
+    iconWrap.innerHTML = '<div class="status-icon-outer"></div><div class="status-icon-middle"></div><div class="status-icon-inner"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>';
+    badge.className = "status-badge";
+    badge.textContent = "✦ CONFIRMED";
+    title.childNodes[0].nodeValue = "Thank ";
+    titleHighlight.textContent = "You!";
+    titleHighlight.className = "text-yellow";
+    desc.innerHTML = 'Our team will <span class="text-highlight">reach out to you within 2 hours.</span><br>Please keep your phone accessible.';
+    dot.className = "green-dot";
+    leftText.textContent = "Team is online";
+    retryBtn.style.display = "none";
+  } else {
+    iconWrap.className = "status-icon-wrap failed";
+    iconWrap.innerHTML = '<div class="status-icon-outer"></div><div class="status-icon-middle"></div><div class="status-icon-inner"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>';
+    badge.className = "status-badge failed";
+    badge.textContent = "✦ FAILED";
+    title.childNodes[0].nodeValue = "Payment ";
+    titleHighlight.textContent = "Failed";
+    titleHighlight.className = "text-red";
+    desc.innerHTML = message || "Your payment could not be processed.";
+    dot.className = "red-dot";
+    leftText.textContent = "System Error";
+    retryBtn.style.display = "block";
+  }
+
+  if (orderId) {
+    pid.style.display = "block";
+    pid.textContent = "Payment ID: " + orderId;
+  } else {
+    pid.style.display = "none";
+  }
+}
+
+function showLoadingModal(message) {
+  var overlay = document.getElementById("statusModalOverlay");
+  if (!overlay) return;
+  
+  var iconWrap = document.getElementById("statusIconWrap");
+  var title = document.getElementById("statusTitle");
+  var titleHighlight = document.getElementById("statusTitleHighlight");
+  var desc = document.getElementById("statusDesc");
+  var badge = document.getElementById("statusBadge");
+  var dot = document.getElementById("statusDot");
+  var leftText = document.getElementById("statusLeftText");
+  var pid = document.getElementById("statusPaymentId");
+  var retryBtn = document.getElementById("statusRetryBtn");
+  var closeBtn = document.querySelector(".status-close-btn");
+
+  overlay.classList.add("active");
+  if (closeBtn) closeBtn.style.display = "none";
+
+  iconWrap.className = "status-icon-wrap loading";
+  iconWrap.innerHTML = '<div class="status-icon-outer" style="animation: spin 3s linear infinite;"></div><div class="status-icon-middle" style="animation: spin 2s linear infinite reverse;"></div><div class="status-icon-inner"><svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.07-7.07l-2.83 2.83M7.76 16.24l-2.83 2.83M19.07 19.07l-2.83-2.83M4.93 4.93l2.83 2.83" style="animation: spin 1.5s linear infinite; transform-origin: 12px 12px;"/></svg></div>';
+  
+  badge.className = "status-badge loading";
+  badge.textContent = "✦ PROCESSING";
+  
+  title.childNodes[0].nodeValue = "Please ";
+  titleHighlight.textContent = "Wait";
+  titleHighlight.className = "text-yellow";
+  
+  desc.innerHTML = message || 'We are securely initializing your payment gateway.<br>Do not refresh or close this window.';
+  
+  dot.className = "green-dot";
+  leftText.textContent = "Secure Connection";
+  
+  retryBtn.style.display = "none";
+  pid.style.display = "none";
+}
+
+function closeStatusModal() {
+  var overlay = document.getElementById("statusModalOverlay");
+  if (overlay) overlay.classList.remove("active");
 }
 
 function reportFailure(cf_order_id, payment_id, description, code) {
@@ -315,3 +399,60 @@ function prefill() {
 }
 
 window.onload = prefill;
+
+// State and City Dropdown Logic
+let stateCityData = null;
+
+function loadStateCityData() {
+  fetch("./state-city.json")
+    .then(res => res.json())
+    .then(data => {
+      stateCityData = data;
+      const stateSelect = document.getElementById("gcc_state");
+      if (stateSelect) {
+        // Clear existing states
+        while (stateSelect.options.length > 1) {
+          stateSelect.remove(1);
+        }
+        
+        // Add all states
+        const states = Object.keys(data).sort();
+        states.forEach(state => {
+          const option = document.createElement("option");
+          option.value = state;
+          option.textContent = state;
+          stateSelect.appendChild(option);
+        });
+        
+        stateSelect.addEventListener("change", function() {
+          updateCityDropdown(this.value);
+        });
+        
+        // Just in case prefill has already set a value
+        if (stateSelect.value) {
+            updateCityDropdown(stateSelect.value);
+        }
+      }
+    })
+    .catch(err => console.error("Could not load state-city.json", err));
+}
+
+function updateCityDropdown(selectedState) {
+  const citySelect = document.getElementById("gcc_city");
+  if (!citySelect) return;
+  
+  // Reset options
+  citySelect.innerHTML = '<option value="">Select city</option>';
+  
+  if (selectedState && stateCityData && stateCityData[selectedState]) {
+    const cities = stateCityData[selectedState].sort();
+    cities.forEach(city => {
+      const option = document.createElement("option");
+      option.value = city;
+      option.textContent = city;
+      citySelect.appendChild(option);
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadStateCityData);

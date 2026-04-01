@@ -310,6 +310,185 @@
     z-index: -1; opacity: 0.15; pointer-events: none;
   }
 
+  /* ── STATUS MODAL ── */
+  .status-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(10, 5, 20, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .status-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+  .status-modal {
+    background: #1e0a30;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    border-radius: 24px;
+    padding: 48px;
+    display: flex;
+    gap: 48px;
+    max-width: 760px;
+    width: 100%;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+    color: white;
+    transform: translateY(20px) scale(0.98);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: 'DM Sans', sans-serif;
+    position: relative;
+  }
+  .status-modal-overlay.active .status-modal {
+    transform: translateY(0) scale(1);
+  }
+  .status-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-right: 48px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .status-icon-wrap {
+    width: 140px; height: 140px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .status-icon-outer {
+    position: absolute;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+  }
+  .status-icon-middle {
+    position: absolute;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 1px solid rgba(139, 92, 246, 0.35);
+  }
+  .status-icon-inner {
+    position: relative;
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.5px solid rgba(139, 92, 246, 0.8);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+  }
+  .status-icon-inner svg {
+    width: 22px; height: 22px;
+    stroke: #D8B4FE;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  
+  .status-icon-wrap.failed .status-icon-outer { border-color: rgba(239, 68, 68, 0.15); }
+  .status-icon-wrap.failed .status-icon-middle { border-color: rgba(239, 68, 68, 0.35); }
+  .status-icon-wrap.failed .status-icon-inner {
+    border-color: rgba(239, 68, 68, 0.8);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+  }
+  .status-icon-wrap.failed .status-icon-inner svg { stroke: #FCA5A5; }
+  
+  .status-online {
+    font-size: 13px; color: #9CA3AF;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .green-dot {
+    width: 8px; height: 8px; background: #10B981; border-radius: 50%;
+    box-shadow: 0 0 8px #10B981;
+  }
+  .red-dot { background: #EF4444; box-shadow: 0 0 8px #EF4444; }
+  
+  .status-right { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(217, 119, 6, 0.15);
+    border: 1px solid rgba(217, 119, 6, 0.3);
+    color: #FBBF24;
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    width: fit-content;
+  }
+  .status-badge.failed {
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    color: #FCA5A5;
+  }
+  .status-badge.loading {
+    background: rgba(167, 139, 250, 0.1);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    color: #a78bfa;
+  }
+  .status-title {
+    font-size: 48px; font-weight: 800; margin-bottom: 16px;
+    letter-spacing: -1px; line-height: 1.1; color: white;
+  }
+  .text-yellow { color: #FBBF24; }
+  .text-red { color: #FCA5A5; }
+  .status-desc { 
+    font-size: 17px; color: #D1D5DB; line-height: 1.6; margin-bottom: 32px; 
+    font-weight: 400;
+  }
+  .text-highlight { color: #C084FC; font-weight: 600; }
+  
+  .status-pid {
+    background: rgba(0,0,0,0.25);
+    padding: 10px 16px; border-radius: 8px;
+    font-size: 13px; color: rgba(255,255,255,0.7);
+    margin-bottom: 24px;
+    font-family: monospace;
+    border: 1px dashed rgba(255,255,255,0.1);
+    width: fit-content;
+  }
+  
+  .status-help {
+    font-size: 13px; color: #9CA3AF;
+    margin-top: 8px;
+    display: flex; gap: 6px; align-items: center;
+  }
+  .status-help span.highlight { color: #C084FC; }
+  
+  .status-retry-btn {
+    background: #6D28D9; color: white;
+    border: none; border-radius: 6px; padding: 12px 24px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 16px; font-family: inherit; width: fit-content;
+  }
+  .status-retry-btn:hover { background: #4C1D95; }
+  
+  .status-close-btn {
+    position: absolute;
+    top: 24px; right: 24px;
+    background: transparent; border: none;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer; padding: 8px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .status-close-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+  .status-close-btn svg {
+    width: 20px; height: 20px;
+    stroke: currentColor; stroke-width: 2; fill: none;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }
+
   @media (max-width: 860px) {
     .page-wrap { grid-template-columns: 1fr; }
     .body-area { overflow-y: auto; height: auto; }
@@ -317,6 +496,12 @@
     .right-col { padding-bottom: 40px; }
     .bg-pattern { display: none; }
     .headline { font-size: 28px; }
+  }
+
+  @media (max-width: 640px) {
+    .status-modal { flex-direction: column; padding: 32px; gap: 32px; border-radius: 20px; }
+    .status-left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); padding-right: 0; padding-bottom: 32px; }
+    .status-title { font-size: 36px; }
   }
 </style>
 </head>
@@ -457,18 +642,13 @@
             <div class="field-label">State <span class="req">*</span></div>
             <select id="gcc_state">
               <option value="">Select state</option>
-              <option>Delhi</option>
-              <option>Haryana</option>
-              <option>Maharashtra</option>
-              <option>Karnataka</option>
-              <option>Uttar Pradesh</option>
-              <option>Tamil Nadu</option>
-              <option>Other</option>
             </select>
           </div>
           <div class="field-group">
             <div class="field-label">City <span class="req">*</span></div>
-            <input id="gcc_city" type="text" placeholder="Your city">
+            <select id="gcc_city">
+              <option value="">Select city</option>
+            </select>
           </div>
         </div>
 
@@ -498,6 +678,39 @@
 
   </div>
 </div>
- <script src="./gcc_vsl_final.js"></script>
+
+<!-- STATUS MODAL -->
+<div id="statusModalOverlay" class="status-modal-overlay">
+  <div class="status-modal" id="statusModal">
+    <button class="status-close-btn" onclick="closeStatusModal()" aria-label="Close modal">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div class="status-left">
+      <div class="status-icon-wrap" id="statusIconWrap">
+        <!-- Circles injected by JS -->
+      </div>
+      <div class="status-online"><span class="green-dot" id="statusDot"></span> <span id="statusLeftText">Team is online</span></div>
+    </div>
+    <div class="status-right">
+      <div class="status-badge" id="statusBadge">✦ CONFIRMED</div>
+      <h2 class="status-title" id="statusTitle">Thank <span class="text-yellow" id="statusTitleHighlight">You!</span></h2>
+      <p class="status-desc" id="statusDesc">
+        Our team will <span class="text-highlight">reach out to you within 2 hours.</span><br>
+        Please keep your phone accessible.
+      </p>
+      
+      <div class="status-pid" id="statusPaymentId" style="display:none;"></div>
+      
+      <button class="status-retry-btn" id="statusRetryBtn" style="display:none;" onclick="closeStatusModal()">Try Again</button>
+      
+      <div class="status-help">
+        Need help? <span class="highlight">info@gccschool.com</span> &nbsp;·&nbsp; <span class="highlight">+91 97735 76111</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+<script src="./gcc_vsl_final.js"></script>
 </body>
 </html>
