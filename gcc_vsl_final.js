@@ -259,7 +259,7 @@ function showStatusModal(isSuccess, message, orderId) {
     title.childNodes[0].nodeValue = "Thank ";
     titleHighlight.textContent = "You!";
     titleHighlight.className = "text-yellow";
-    desc.innerHTML = 'Our team will <span class="text-highlight">reach out to you within 2 hours.</span><br>Please keep your phone accessible.';
+    desc.innerHTML = message ? message : 'Our team will <span class="text-highlight">reach out to you within 2 hours.</span><br>Please keep your phone accessible.';
     dot.className = "green-dot";
     leftText.textContent = "Team is online";
     retryBtn.style.display = "none";
@@ -470,4 +470,36 @@ function playVideo() {
   });
 
   startVideoTimer(); // your existing function
+}
+
+async function handleBookFreeCall(e) {
+  e.preventDefault();
+  
+  showLoadingModal("Processing your request...");
+  
+  const current = new URLSearchParams(window.location.search);
+  const data = {
+    full_name: current.get('full_name') || "",
+    email: current.get('email') || "",
+    phone: current.get('phone') || "",
+    degree: current.get('degree') || "",
+    degree_stage: current.get('degree_stage') || "",
+    book_call: 1
+  };
+  
+  try {
+    const res = await fetch(`https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app/api/career/createvslform`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    console.log("API Response:", result);
+    
+    // show success modal
+    showStatusModal(true, 'You will <span class="text-highlight">receive the call within 2 hours</span> from our expert.<br>Please keep your phone accessible.', null);
+  } catch (err) {
+    console.error("Error booking call:", err);
+    showStatusModal(false, "Network error. Please try again.", null);
+  }
 }
