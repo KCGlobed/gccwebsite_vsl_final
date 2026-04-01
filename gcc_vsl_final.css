@@ -100,7 +100,7 @@ body {
 .hero {
   max-width: 860px;
   margin: 0 auto;
-  padding: 48px 20px 16px;
+  padding: 30px 20px 16px;
   text-align: center;
 }
 
@@ -120,11 +120,11 @@ body {
 
 h1 {
   font-family: 'Manrope', sans-serif;
-  font-size: clamp(22px, 4.5vw, 38px);
-  font-weight: 800;
+  font-size: 35px;
+  font-weight: 900;
   line-height: 1.2;
-  max-width: 760px;
-  margin: 0 auto 16px;
+  max-width: 850;
+  margin: 0 auto 18px;
 }
 
 h1 em {
@@ -133,16 +133,23 @@ h1 em {
 }
 
 .hero-sub {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-muted);
-  max-width: 600px;
-  margin: 0 auto 12px;
-  line-height: 1.55;
+  max-width: 640px;
+  margin: 0 auto 14px;
+  line-height: 1.5;
 }
 
-.hero-sub strong {
+.highlight-line {
+  font-size: 25px;
+  font-weight: 700;
   color: var(--white);
+  margin-bottom: 14px;
+}
+
+.highlight-line strong {
+  color: var(--gold);
 }
 
 .guarantee-line {
@@ -154,7 +161,13 @@ h1 em {
   border-radius: 6px;
   padding: 10px 20px;
   display: inline-block;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
+}
+
+.deadline {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ff6b6b;
 }
 
 /* VIDEO SECTION */
