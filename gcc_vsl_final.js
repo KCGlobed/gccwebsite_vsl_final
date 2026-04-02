@@ -154,7 +154,7 @@ function startPayment(name, email, mobile, city, state, form_id) {
         // Ensure loader shows for at least 2 seconds
         setTimeout(function () {
           closeStatusModal();
-          launchCashfree(data);
+          launchCashfree(data, { name, email, mobile, city, state, form_id });
         }, 2000);
       } else {
         showStatusModal(false, "Unexpected gateway response. Please contact support.", null);
@@ -167,7 +167,7 @@ function startPayment(name, email, mobile, city, state, form_id) {
 }
 
 
-function launchCashfree(data) {
+function launchCashfree(data, form) {
   console.log("Initializing Cashfree checkout (v3)...");
   if (typeof Cashfree === "undefined") {
     showStatusModal(false, "Payment gateway could not be loaded. Please refresh the page.", data.cf_order_id);
@@ -186,12 +186,12 @@ function launchCashfree(data) {
       showStatusModal(false, result.error.message, data.cf_order_id);
     } else if (result.paymentDetails) {
       console.log("Cashfree checkout success (via result object):", result.paymentDetails);
-      completePayment(data.cf_order_id);
+      completePayment(data.cf_order_id, form);
     } else if (result.redirect) {
       console.log("Cashfree checkout redirecting...");
     } else {
       console.log("Cashfree checkout finished without specific result. Verifying order status...");
-      completePayment(data.cf_order_id);
+      completePayment(data.cf_order_id, form);
     }
   });
 
@@ -200,7 +200,7 @@ function launchCashfree(data) {
 }
 
 
-async function completePayment(cf_order_id) {
+async function completePayment(cf_order_id, form) {
   console.log("Triggering /api/complete-payment for cf_order_id:", cf_order_id);
   showLoadingModal("Verifying your payment...");
 
@@ -218,7 +218,7 @@ async function completePayment(cf_order_id) {
     const paymentData = await paymentRes.json();
     console.log("complete-payment response:", paymentData);
 
-    if (paymentData && paymentData.success === true) {
+    if (paymentData.success) {
       console.log("Payment successful according to backend.");
       try {
         const studentRes = await fetch(BASE_URL + "/api/users/create_student/", {
@@ -230,7 +230,7 @@ async function completePayment(cf_order_id) {
             city: form.city,
             state: form.state,
             country: "India",
-            phone1: form.phone,
+            phone1: form.mobile,
           }),
         });
 
