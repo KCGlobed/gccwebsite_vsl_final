@@ -200,39 +200,58 @@ function launchCashfree(data) {
 }
 
 
-function completePayment(cf_order_id) {
+async function completePayment(cf_order_id) {
   console.log("Triggering /api/complete-payment for cf_order_id:", cf_order_id);
   showLoadingModal("Verifying your payment...");
 
-  // Artificial delay to ensure loader is visible
-  setTimeout(function () {
-    fetch(BASE_URL + "/api/complete-payment", {
+  try {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    const paymentRes = await fetch(BASE_URL + "/api/complete-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         cf_order_id: cf_order_id,
         re_attempt_status: false,
       }),
-    })
-      .then(res => res.json())
-      .then(function (data) {
-        console.log("complete-payment response:", data);
+    });
 
-        if (data && data.success === true) {
-          console.log("Payment successful according to backend.");
-          showStatusModal(true, "", cf_order_id);
-        } else {
-          console.warn("Payment verification failed according to backend.", data.message || "Unknown error");
-          showStatusModal(false, data.message || "Payment verification failed.", cf_order_id);
-        }
-      })
-      .catch(function (err) {
-        console.error("complete-payment network error:", err);
-        showStatusModal(false, "Network error during verification.", cf_order_id);
-      });
-  }, 2000);
+    const paymentData = await paymentRes.json();
+    console.log("complete-payment response:", paymentData);
+
+    if (paymentData && paymentData.success === true) {
+      console.log("Payment successful according to backend.");
+      try {
+        const studentRes = await fetch(BASE_URL + "/api/users/create_student/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            full_name: form.name,
+            email: form.email,
+            city: form.city,
+            state: form.state,
+            country: "India",
+            phone1: form.phone,
+          }),
+        });
+
+        const studentData = await studentRes.json();
+        console.log("Student created:", studentData);
+
+      } catch (studentErr) {
+        console.error("Student creation failed:", studentErr);
+      }
+      showStatusModal(true, "", cf_order_id);
+
+    } else {
+      console.warn("Payment verification failed.", paymentData.message || "Unknown error");
+      showStatusModal(false, paymentData.message || "Payment verification failed.", cf_order_id);
+    }
+
+  } catch (err) {
+    console.error("complete-payment error:", err);
+    showStatusModal(false, "Network error during verification.", cf_order_id);
+  }
 }
-
 function showStatusModal(isSuccess, message, orderId) {
   var overlay = document.getElementById("statusModalOverlay");
   if (!overlay) return;
