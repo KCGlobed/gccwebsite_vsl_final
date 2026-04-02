@@ -2,8 +2,8 @@
 var BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
 // var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
 var mode = "production";
-var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app"
-// var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
+// var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app"
+var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
 // var mode = "sandbox"
 var FORM_TYPE = 2
 var FORM_ID = 170532
@@ -542,6 +542,31 @@ function updateCityDropdown(selectedState) {
 document.addEventListener("DOMContentLoaded", loadStateCityData);
 
 
+let lastVideoPlaybackSent = -1;
+
+async function sendVideoPlaybackAPI(seconds) {
+  if (seconds === lastVideoPlaybackSent) return;
+  lastVideoPlaybackSent = seconds;
+
+  const current = new URLSearchParams(window.location.search);
+  const dossierId = current.get('form_id');
+
+  const data = {
+    dossier_id: Number(dossierId),
+    video_playback: seconds
+  };
+
+  try {
+    await fetch(`${GCC_BACKEND_URL}/api/career/createvsldetailform`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  } catch (err) {
+    console.error("Error sending video playback:", err);
+  }
+}
+
 function playVideo() {
   document.getElementById("videoPlaceholder").style.display = "none";
   document.getElementById("videoEmbed").style.display = "block";
@@ -554,6 +579,26 @@ function playVideo() {
   });
 
   startVideoTimer(); // your existing function
+
+  if (!video.dataset.trackingAttached) {
+    video.dataset.trackingAttached = "true";
+    
+    video.addEventListener("timeupdate", () => {
+      const currentSec = Math.floor(video.currentTime);
+      // Send every 10 seconds
+      if (currentSec > 0 && currentSec % 10 === 0 && currentSec !== lastVideoPlaybackSent) {
+        sendVideoPlaybackAPI(currentSec);
+      }
+    });
+
+    video.addEventListener("pause", () => {
+      sendVideoPlaybackAPI(Math.floor(video.currentTime));
+    });
+    
+    video.addEventListener("ended", () => {
+      sendVideoPlaybackAPI(Math.floor(video.currentTime));
+    });
+  }
 }
 
 async function handleSpecialistClick(e) {
