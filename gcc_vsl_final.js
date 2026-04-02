@@ -1,5 +1,10 @@
 
 var BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
+// var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
+var mode = "production";
+var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app"
+// var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
+// var mode = "sandbox"
 var FORM_TYPE = 2
 var FORM_ID = 170532
 
@@ -102,6 +107,8 @@ function handlePayClick() {
   var state = document.getElementById("gcc_state").value.trim();
   const params = new URLSearchParams(window.location.search);
   const form_id = params.get("form_id");
+  const degree = params.get("degree");
+  const degree_stage = params.get("degree_stage");
   console.log("form_id", form_id);
   var errEl = document.getElementById("gccFormError");
 
@@ -117,7 +124,7 @@ function handlePayClick() {
     return showError(errEl, "Please enter your state.");
 
   showLoadingModal("Initializing secure checkout...");
-  startPayment(name, email, phone, city, state, form_id);
+  startPayment(name, email, phone, city, state, form_id, degree, degree_stage);
 }
 
 function showError(el, msg) {
@@ -125,45 +132,101 @@ function showError(el, msg) {
   // el.style.display = "block";
 }
 
-function startPayment(name, email, mobile, city, state, form_id) {
-  console.log("Starting payment initialization...", { name, email, mobile, city, state, form_id });
-  fetch(BASE_URL + "/api/start-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: name,
-      email: email,
-      mobile: mobile,
-      city: city,
-      state: state,
-      form_type: 2,
-      form_id: form_id,
-      source: 13
-    }),
-  })
-    .then(function (res) { return res.json(); })
-    .then(function (data) {
-      console.log("start-payment response:", data);
-      if (!data.success) {
-        showStatusModal(false, data.message || "Could not initiate payment. Please try again.", null);
-        return;
-      }
-
-      if (data.gateway === "cashfree") {
-        console.log("Launching Cashfree modal...");
-        // Ensure loader shows for at least 2 seconds
-        setTimeout(function () {
-          closeStatusModal();
-          launchCashfree(data, { name, email, mobile, city, state, form_id });
-        }, 2000);
-      } else {
-        showStatusModal(false, "Unexpected gateway response. Please contact support.", null);
-      }
-    })
-    .catch(function (err) {
-      console.error("Critical error in start-payment:", err);
-      showStatusModal(false, "Network error. Please check your connection and try again.", null);
+async function startPayment(name, email, mobile, city, state, form_id, degree, degree_stage) {
+  console.log("Starting payment initialization...", { name, email, mobile, city, state, form_id, degree, degree_stage });
+  try {
+    // ✅ Step 1: Create Form
+    const formRes = await fetch(GCC_BACKEND_URL + "/api/career/createvslfinalform", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        full_name: name,
+        email,
+        phone: mobile,
+        city,
+        state,
+        degree,
+        degree_stage
+      }),
     });
+
+    const formData = await formRes.json();
+    console.log("createvslfinalform response:", formData);
+
+    const latest_form_id = formData?.data?.id;
+    console.log(latest_form_id,'--------')
+
+    if (!latest_form_id) {
+      throw new Error("Form ID not received");
+    }
+
+    // ✅ Step 2: Save Lead
+    try {
+      const leadRes = await fetch(BASE_URL + "/api/save-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          mobile,
+          city,
+          state,
+          form_type: 2,
+          form_id: latest_form_id,
+          source: 13,
+          action: "pay_now"
+        }),
+      });
+
+      const leadData = await leadRes.json();
+      console.log("save-lead response:", leadData);
+
+    } catch (leadErr) {
+      console.error("Error in save-lead:", leadErr);
+      // optional: continue flow
+    }
+
+    // ✅ Step 3: Start Payment
+    const paymentRes = await fetch(BASE_URL + "/api/start-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        email,
+        mobile,
+        city,
+        state,
+        form_type: 2,
+        form_id: latest_form_id,
+        source: 13
+      }),
+    });
+
+    const paymentData = await paymentRes.json();
+    console.log("start-payment response:", paymentData);
+
+    if (!paymentData.success) {
+      showStatusModal(false, paymentData.message || "Could not initiate payment. Please try again.", null);
+      return;
+    }
+
+    // ✅ Step 4: Launch Payment Gateway
+    if (paymentData.gateway === "cashfree") {
+      console.log("Launching Cashfree modal...");
+
+      setTimeout(function () {
+        closeStatusModal();
+        launchCashfree(paymentData, { name, email, mobile, city, state, latest_form_id });
+      }, 2000);
+
+    } else {
+      showStatusModal(false, "Unexpected gateway response. Please contact support.", null);
+    }
+
+  } catch (err) {
+    console.error("Critical error in startPayment:", err);
+    showStatusModal(false, "Something went wrong. Please try again.", null);
+  }
 }
 
 
@@ -173,7 +236,7 @@ function launchCashfree(data, form) {
     showStatusModal(false, "Payment gateway could not be loaded. Please refresh the page.", data.cf_order_id);
     return;
   }
-  const cashfree = Cashfree({ mode: "production" });
+  const cashfree = Cashfree({ mode: mode });
 
   cashfree.checkout({
     paymentSessionId: data.payment_session_id,
@@ -221,7 +284,7 @@ async function completePayment(cf_order_id, form) {
     if (paymentData.success) {
       console.log("Payment successful according to backend.");
       try {
-        const studentRes = await fetch("https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app/api/users/create_student/", {
+        const studentRes = await fetch(GCC_BACKEND_URL + "/api/users/create_student/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -383,7 +446,9 @@ document.addEventListener("click", function (e) {
     mobile: current.get("phone") || "",
     city: current.get("city") || "",
     state: current.get("state") || "",
-    form_id: current.get("form_id")
+    form_id: current.get("form_id"),
+    degree: current.get("degree") || "",
+    degree_stage: current.get("degree_stage") || "",
   });
 
   console.log("Final Params →", params.toString());
@@ -491,34 +556,31 @@ function playVideo() {
   startVideoTimer(); // your existing function
 }
 
-async function handleBookFreeCall(e) {
+async function handleSpecialistClick(e) {
   e.preventDefault();
+  const targetHref = '/thank-you.html';
+  const current = new URLSearchParams(window.location.search);
+  const dossierId = current.get('form_id')
+  console.log(dossierId, 'dossierId')
+  const data = {
+    dossier_id: Number(dossierId),
+    specialist_status: true
+  };
 
   showLoadingModal("Processing your request...");
 
-  const current = new URLSearchParams(window.location.search);
-  const data = {
-    full_name: current.get('full_name') || "",
-    email: current.get('email') || "",
-    phone: current.get('phone') || "",
-    degree: current.get('degree') || "",
-    degree_stage: current.get('degree_stage') || "",
-    book_call: 1
-  };
-
   try {
-    const res = await fetch(`https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app/api/career/createvslform`, {
+    const res = await fetch(`${GCC_BACKEND_URL}/api/career/addvsldetailform`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     const result = await res.json();
-    console.log("API Response:", result);
-
-    // show success modal
-    showStatusModal(true, 'You will <span class="text-highlight">receive the call within 2 hours</span> from our expert.<br>Please keep your phone accessible.', null);
+    console.log("API Response:", result)
+    window.location.href = targetHref;
   } catch (err) {
-    console.error("Error booking call:", err);
-    showStatusModal(false, "Network error. Please try again.", null);
+    console.error("Error tracking specialist click:", err);
+    // Proceed to redirect even if API fails
+    window.location.href = targetHref;
   }
 }
