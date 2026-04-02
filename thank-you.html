@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thank You — GCC School</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1308129784468579');
+fbq('track', 'Purchase', {value: 2950.00, currency: 'INR'});
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1308129784468579&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deep:    #160828;
+      --bg-mid:     #1f0e38;
+      --card-bg:    rgba(255,255,255,0.035);
+      --card-border:rgba(160,110,230,0.18);
+      --purple-dim: rgba(140,90,220,0.4);
+      --accent-purple: #9b7fd4;
+      --accent-yellow: #f5b731;
+      --text-white:  #f0eaf8;
+      --text-muted:  rgba(210,195,240,0.65);
+      --text-faint:  rgba(200,180,235,0.38);
+      --green-dot:   #3ecf75;
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-white);
+      overflow-x: hidden;
+    }
+
+    /* ── Background ── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Chevron / arrow pattern */
+    .bg-layer::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          45deg,
+          transparent 0px,
+          transparent 22px,
+          rgba(130,80,210,0.07) 22px,
+          rgba(130,80,210,0.07) 24px,
+          transparent 24px,
+          transparent 46px
+        ),
+        repeating-linear-gradient(
+          135deg,
+          transparent 0px,
+          transparent 22px,
+          rgba(130,80,210,0.07) 22px,
+          rgba(130,80,210,0.07) 24px,
+          transparent 24px,
+          transparent 46px
+        );
+    }
+
+    /* Soft radial glow behind card */
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center,
+        rgba(100,50,190,0.28) 0%,
+        rgba(60,20,130,0.10) 50%,
+        transparent 75%
+      );
+    }
+
+    /* ── Page layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+      width: 100%;
+      max-width: 880px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      animation: cardIn 0.65s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(28px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0)    scale(1); }
+    }
+
+    /* ── Left panel ── */
+    .left {
+      flex-shrink: 0;
+      width: 230px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      padding: 52px 28px;
+      border-right: 1px solid rgba(150,100,220,0.13);
+    }
+
+    /* Concentric rings */
+    .icon-wrap {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px solid var(--purple-dim);
+    }
+    .ring-1 { width: 110px; height: 110px; border-color: rgba(140,90,220,0.22); animation: pulse 2.8s ease-in-out infinite; }
+    .ring-2 { width:  80px; height:  80px; border-color: rgba(140,90,220,0.35); }
+
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0   rgba(140,90,220,0.0);  }
+      50%      { box-shadow: 0 0 0 10px rgba(140,90,220,0.10); }
+    }
+
+    .check-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .check-svg {
+      width: 28px; height: 28px;
+      stroke: var(--accent-purple);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      stroke-dasharray: 38;
+      stroke-dashoffset: 38;
+      animation: drawCheck 0.7s 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Green online dot */
+    .online-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .green-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--green-dot);
+      box-shadow: 0 0 0 3px rgba(62,207,117,0.18);
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(62,207,117,0.18); }
+      50%      { box-shadow: 0 0 0 6px rgba(62,207,117,0.08); }
+    }
+
+    .online-label {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* ── Right panel ── */
+    .right {
+      flex: 1;
+      padding: 52px 52px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(130,85,215,0.10);
+      border: 1px solid rgba(130,85,215,0.30);
+      border-radius: 999px;
+      padding: 6px 16px;
+      width: fit-content;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: #b99de8;
+      animation: fadeUp 0.5s 0.15s both;
+    }
+
+    /* Heading */
+    .heading {
+      /* font-family: 'Syne', sans-serif; */
+      font-weight: 800;
+      font-size: clamp(40px, 5.5vw, 58px);
+      line-height: 1.05;
+      color: var(--text-white);
+      animation: fadeUp 0.5s 0.25s both;
+    }
+
+    .heading .yellow { color: var(--accent-yellow); }
+
+    /* Description */
+    .desc {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text-muted);
+      animation: fadeUp 0.5s 0.35s both;
+    }
+
+    .desc .hl {
+      color: var(--accent-purple);
+      font-weight: 500;
+    }
+
+    /* Divider */
+    .divider {
+      width: 48px;
+      height: 1px;
+      background: rgba(150,100,220,0.20);
+      animation: fadeUp 0.5s 0.42s both;
+    }
+
+    /* Help row */
+    .help {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.5s 0.48s both;
+    }
+
+    .help-label {
+      font-size: 13.5px;
+      color: var(--text-faint);
+    }
+
+    .help-sep {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: rgba(200,180,235,0.20);
+    }
+
+    .help a {
+      font-size: 13.5px;
+      color: var(--accent-yellow);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .help a:hover { opacity: 0.72; }
+
+    /* Shared fade-up */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .card { flex-direction: column; }
+      .left {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(150,100,220,0.13);
+        padding: 40px 24px 32px;
+      }
+      .right { padding: 32px 24px 40px; }
+      .heading { font-size: 38px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-layer" aria-hidden="true"></div>
+
+  <main class="page">
+    <div class="card" role="main">
+
+      <!-- Left: icon + status -->
+      <div class="left">
+        <div class="icon-wrap">
+          <div class="ring ring-1"></div>
+          <div class="ring ring-2"></div>
+          <div class="check-circle">
+            <svg class="check-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="online-row">
+          <div class="green-dot"></div>
+          <span class="online-label">Team is online</span>
+        </div>
+      </div>
+
+      <!-- Right: content -->
+      <div class="right">
+        <div class="badge">✦ Confirmed</div>
+
+        <h1 class="heading">Thank <span class="yellow">You!</span></h1>
+
+        <p class="desc">
+          Our team will <span class="hl">reach out to you within 2 hours.</span><br>
+          Please keep your phone accessible.
+        </p>
+
+        <div class="divider"></div>
+
+        <div class="help">
+          <span class="help-label">Need help?</span>
+          <a href="mailto:info@gccschool.com">info@gccschool.com</a>
+          <div class="help-sep"></div>
+          <a href="tel:+919773576111">+91 97735 76111</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

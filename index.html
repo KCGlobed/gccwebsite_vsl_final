@@ -9,13 +9,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="gcc_vsl_final.css">
+  <!-- Meta Pixel Code -->
+  <script>
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () {
+        n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+      n.queue = []; t = b.createElement(e); t.async = !0;
+      t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1308129784468579');
+    fbq('track', 'Lead');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1308129784468579&ev=PageView&noscript=1" /></noscript>
+  <!-- End Meta Pixel Code -->
+
 </head>
 
 <body>
 
   <!-- URGENCY BAR -->
   <div class="urgency-bar">
-    ⚠️ NFET Slot Booking Closes <strong>April 15, 2026</strong> · July 2026 Cohort · Limited Seats
+    ⚠️ NFET Slot Booking Closes <strong>April 30, 2026</strong> · July 2026 Cohort · Limited Seats
   </div>
 
   <!-- HEADER -->
@@ -142,7 +162,7 @@
         <div style="font-size:15px; font-weight:700; margin-bottom:16px; color:rgba(255,255,255,0.7);">
           100% Free
         </div>
-        <a href="#" onclick="handleBookFreeCall(event)" class="btn-outline">📞 Book a Free Call »</a>
+        <a href="/thank-you.html" class="btn-outline">📞 Book a Free Call »</a>
         <p class="btn-note">WhatsApp +91 9773576111 · Usually responds within 2 hours</p>
       </div>
     </div>
@@ -386,7 +406,7 @@
       </p>
       <div class="final-btns">
         <a href="#" class="btn-cta-large">🔒 Book My NFET Slot — ₹2,950 »</a>
-        <a href="#" onclick="handleBookFreeCall(event)" class="btn-cta-secondary">📞 Talk to a Specialist</a>
+        <a href="/thank-you.html" class="btn-cta-secondary">📞 Talk to a Specialist</a>
       </div>
       <p class="final-deadline">🕐 Slot booking closes April 15, 2026 · Secure payment · Instant confirmation</p>
     </div>
