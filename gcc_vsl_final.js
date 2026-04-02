@@ -221,7 +221,7 @@ async function completePayment(cf_order_id, form) {
     if (paymentData.success) {
       console.log("Payment successful according to backend.");
       try {
-        const studentRes = await fetch(BASE_URL + "/api/users/create_student/", {
+        const studentRes = await fetch("https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app/api/users/create_student/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
