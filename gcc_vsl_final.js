@@ -1,10 +1,10 @@
 
-// var BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
-var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
-// var mode = "production";
-// var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app"
-var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
-var mode = "sandbox"
+var BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
+// var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
+var mode = "production";
+var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app"
+// var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
+// var mode = "sandbox"
 var FORM_TYPE = 2
 var FORM_ID = 170532
 
