@@ -588,33 +588,41 @@ function playVideo() {
   document.getElementById("videoEmbed").style.display = "block";
 
   const video = document.getElementById("videoPlayer");
+  const iframe = document.querySelector("#videoEmbed iframe");
 
-  // autoplay after user click
-  video.play().catch(() => {
-    console.log("Autoplay blocked (rare)");
-  });
-
-  startVideoTimer();
-
-  if (!video.dataset.trackingAttached) {
-    video.dataset.trackingAttached = "true";
-
-    
-    video.addEventListener("timeupdate", () => {
-      const currentSec = Math.floor(video.currentTime);
-      // Send every 10 seconds
-      if (currentSec > 0 && currentSec % 10 === 0 && currentSec !== lastVideoPlaybackSent) {
-        sendVideoPlaybackAPI(currentSec);
-      }
+  if (video) {
+    // autoplay after user click
+    video.play().catch(() => {
+      console.log("Autoplay blocked (rare)");
     });
 
-    video.addEventListener("pause", () => {
-      sendVideoPlaybackAPI(Math.floor(video.currentTime));
-    });
-    
-    video.addEventListener("ended", () => {
-      sendVideoPlaybackAPI(Math.floor(video.currentTime));
-    });
+    startVideoTimer();
+
+    if (!video.dataset.trackingAttached) {
+      video.dataset.trackingAttached = "true";
+
+      video.addEventListener("timeupdate", () => {
+        const currentSec = Math.floor(video.currentTime);
+        // Send every 10 seconds
+        if (currentSec > 0 && currentSec % 10 === 0 && currentSec !== lastVideoPlaybackSent) {
+          sendVideoPlaybackAPI(currentSec);
+        }
+      });
+
+      video.addEventListener("pause", () => {
+        sendVideoPlaybackAPI(Math.floor(video.currentTime));
+      });
+      
+      video.addEventListener("ended", () => {
+        sendVideoPlaybackAPI(Math.floor(video.currentTime));
+      });
+    }
+  } else if (iframe) {
+    // It's a YouTube iframe, try to autoplay by adding autoplay=1
+    if (!iframe.src.includes("autoplay=1")) {
+      iframe.src += (iframe.src.includes("?") ? "&" : "?") + "autoplay=1";
+    }
+    startVideoTimer();
   }
 }
 
