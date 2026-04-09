@@ -85,21 +85,12 @@
   <div class="video-section">
     <div class="video-wrapper">
       <div class="video-container">
-        <div class="video-placeholder" id="videoPlaceholder"
-          style="background: url('https://storage.googleapis.com/gcc_prod_static_files_backend/static/images/gcc_vsl_kc_video.jpeg') center/cover no-repeat;"
-          onclick="playVideo()">
-          <div class="play-btn">▶</div>
-        </div>
-        <div id="videoEmbed" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%;">
+        <div id="videoEmbed" style="display:block; position:absolute; top:0; left:0; width:100%; height:100%;">
 
-          <video id="videoPlayer" width="100%" height="100%" controls controlsList="nodownload" preload="metadata"
-            playsinline autoplay muted
-            style="background:#000;">
-            <source
-              src="https://storage.googleapis.com/gcc_prod_static_files_backend/static/videos/GCC%20VSL_BASIC%20CUTS.mp4"
-              type="video/mp4">
-
-          </video>
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/izq3b_THL7Y?si=Oq6pqv2mamX9PsnX&autoplay=1&mute=1"
+            title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
         </div>
       </div>
