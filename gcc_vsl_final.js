@@ -1,10 +1,10 @@
 
-var BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
-// var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
-var mode = "production";
-var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app"
-// var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
-// var mode = "sandbox"
+// var BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
+var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
+// var mode = "production";
+// var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app"
+var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
+var mode = "sandbox"
 var FORM_TYPE = 2
 var FORM_ID = 170532
 
@@ -303,7 +303,7 @@ async function completePayment(cf_order_id, form) {
       } catch (studentErr) {
         console.error("Student creation failed:", studentErr);
       }
-      showStatusModal(true, "", cf_order_id);
+      window.location.href = "/thank-you.html?cf_order_id=" + cf_order_id;
 
     } else {
       console.warn("Payment verification failed.", paymentData.message || "Unknown error");
@@ -458,8 +458,24 @@ document.addEventListener("click", function (e) {
 
 window.addEventListener("DOMContentLoaded", function () {
   startLockCountdown();
-  // wireCtaButtons();
-  // injectModal();
+  // Autoplay functionality - Attempt to play unmuted. If blocked, show placeholder.
+  if (document.getElementById("videoPlayer")) {
+    const video = document.getElementById("videoPlayer");
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        // Autoplay worked! Show embed.
+        document.getElementById("videoPlaceholder").style.display = "none";
+        document.getElementById("videoEmbed").style.display = "block";
+        startVideoTimer();
+      }).catch((e) => {
+        // Autoplay blocked by browser. Leave placeholder visible.
+        console.log("Autoplay with sound blocked. User must interact.", e);
+        document.getElementById("videoPlaceholder").style.display = "block";
+        document.getElementById("videoEmbed").style.display = "none";
+      });
+    }
+  }
 });
 
 
@@ -573,15 +589,16 @@ function playVideo() {
 
   const video = document.getElementById("videoPlayer");
 
-  // ✅ autoplay after user click
+  // autoplay after user click
   video.play().catch(() => {
     console.log("Autoplay blocked (rare)");
   });
 
-  startVideoTimer(); // your existing function
+  startVideoTimer();
 
   if (!video.dataset.trackingAttached) {
     video.dataset.trackingAttached = "true";
+
     
     video.addEventListener("timeupdate", () => {
       const currentSec = Math.floor(video.currentTime);
@@ -603,7 +620,6 @@ function playVideo() {
 
 async function handleSpecialistClick(e) {
   e.preventDefault();
-  const targetHref = '/thank-you.html';
   const current = new URLSearchParams(window.location.search);
   const dossierId = current.get('form_id')
   console.log(dossierId, 'dossierId')
@@ -621,11 +637,12 @@ async function handleSpecialistClick(e) {
       body: JSON.stringify(data),
     });
     const result = await res.json();
-    console.log("API Response:", result)
-    window.location.href = targetHref;
+    console.log("API Response:", result);
+    closeStatusModal();
+    showStatusModal(true, "Our team will <span class=\"text-highlight\">reach out to you within 2 hours.</span><br>Please keep your phone accessible.", null);
   } catch (err) {
     console.error("Error tracking specialist click:", err);
-    // Proceed to redirect even if API fails
-    window.location.href = targetHref;
+    closeStatusModal();
+    showStatusModal(true, "Our team will <span class=\"text-highlight\">reach out to you within 2 hours.</span><br>Please keep your phone accessible.", null);
   }
 }
