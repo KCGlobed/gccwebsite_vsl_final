@@ -588,12 +588,15 @@ function playVideo() {
   document.getElementById("videoEmbed").style.display = "block";
 
   const video = document.getElementById("videoPlayer");
-  const iframe = document.querySelector("#videoEmbed iframe");
 
   if (video) {
-    // autoplay after user click
-    video.play().catch(() => {
-      console.log("Autoplay blocked (rare)");
+    // 🔊 Unmute because user clicked
+    video.muted = false;
+
+    video.play().then(() => {
+      console.log("Video playing with sound ✅");
+    }).catch(() => {
+      console.log("Autoplay blocked");
     });
 
     startVideoTimer();
@@ -601,10 +604,17 @@ function playVideo() {
     if (!video.dataset.trackingAttached) {
       video.dataset.trackingAttached = "true";
 
+      let lastTracked = -1;
+
       video.addEventListener("timeupdate", () => {
         const currentSec = Math.floor(video.currentTime);
-        // Send every 10 seconds
-        if (currentSec > 0 && currentSec % 10 === 0 && currentSec !== lastVideoPlaybackSent) {
+
+        if (
+          currentSec > 0 &&
+          currentSec % 10 === 0 &&
+          currentSec !== lastTracked
+        ) {
+          lastTracked = currentSec;
           sendVideoPlaybackAPI(currentSec);
         }
       });
@@ -612,17 +622,11 @@ function playVideo() {
       video.addEventListener("pause", () => {
         sendVideoPlaybackAPI(Math.floor(video.currentTime));
       });
-      
+
       video.addEventListener("ended", () => {
         sendVideoPlaybackAPI(Math.floor(video.currentTime));
       });
     }
-  } else if (iframe) {
-    // It's a YouTube iframe, try to autoplay by adding autoplay=1
-    if (!iframe.src.includes("autoplay=1")) {
-      iframe.src += (iframe.src.includes("?") ? "&" : "?") + "autoplay=1";
-    }
-    startVideoTimer();
   }
 }
 
